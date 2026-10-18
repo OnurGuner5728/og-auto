@@ -8,25 +8,24 @@ import android.hardware.HardwareBuffer
 import android.media.ImageReader
 import android.os.Handler
 import android.os.HandlerThread
+import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import android.view.Surface
 import androidx.annotation.RequiresApi
 import com.onurguner.ogauto.core.AspectFit
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * Paced mirror pipeline. The projection renders the phone screen into an
- * ImageReader at a reduced resolution, and frames are blitted onto the car
- * surface with a hardware canvas — scaled to fit (letterbox) or fill (center
- * crop) — at most [maxFps] times a second.
+ * Copies the latest MediaProjection image to Android Auto's surface.
  *
- * Why pace: Android Auto re-encodes the car surface to H.264 on the phone's
- * hardware encoder. A full-rate 1080p video mirrored 1:1 makes that encoder
- * work flat out while the same chip also decodes the stream; on many phones
- * the encoder stalls and the whole Android Auto display freezes. Fewer, smaller
- * frames keep it inside its budget.
+ * Crucial: acquireLatestImage() and close() happen for EVERY ImageReader
+ * notification, including throttled frames. Holding images in the reader
+ * while waiting for the next 24/30 fps slot back-pressures VirtualDisplay
+ * and can leave the whole AA surface stuck when another app starts video.
  */
 @RequiresApi(29)
 class FillRenderer(
@@ -37,17 +36,12 @@ class FillRenderer(
     maxFps: Int,
     maxCaptureEdge: Int,
 ) {
-
     private val thread = HandlerThread("mirror-renderer").apply { start() }
     private val handler = Handler(thread.looper)
-    @Volatile
-    private var released = false
+    private val pacer = FramePacer(maxFps)
+    @Volatile private var released = false
+    private var lastErrorLogMs = 0L
 
-    private val intervalMs: Long = if (maxFps in 1..59) 1000L / maxFps else 0L
-    private var lastDrawMs = 0L
-    private var drawScheduled = false
-
-    /** Capture size: phone aspect, longest edge capped. */
     val captureWidth: Int
     val captureHeight: Int
 
@@ -59,7 +53,6 @@ class FillRenderer(
         val scale = if (maxCaptureEdge > 0) {
             minOf(1f, maxCaptureEdge.toFloat() / max(phoneWidth, phoneHeight))
         } else 1f
-        // Even sizes keep every encoder and GPU path happy.
         captureWidth = ((phoneWidth * scale).roundToInt() / 2 * 2).coerceAtLeast(2)
         captureHeight = ((phoneHeight * scale).roundToInt() / 2 * 2).coerceAtLeast(2)
         reader = ImageReader.newInstance(
@@ -76,68 +69,70 @@ class FillRenderer(
             dst = Rect(fit.x, fit.y, fit.x + fit.width, fit.y + fit.height)
         }
         reader.setOnImageAvailableListener({ onFrame() }, handler)
-        Log.i(TAG, "capture ${captureWidth}x$captureHeight -> car ${target.width}x${target.height} " +
-            "fill=$fill maxFps=$maxFps")
+        Log.i(TAG, "capture " + captureWidth + "x" + captureHeight +
+            " -> car " + target.width + "x" + target.height +
+            " fill=" + fill + " maxFps=" + maxFps)
     }
 
-    /** Where the VirtualDisplay must render. */
     val surface: Surface
         get() = reader.surface
 
-    private val drawLatest = Runnable {
-        drawScheduled = false
-        drawNow()
-    }
-
     private fun onFrame() {
         if (released) return
-        MirrorStats.onFrameProduced()
-        if (intervalMs == 0L) {
-            drawNow()
-            return
-        }
-        val wait = lastDrawMs + intervalMs - SystemClock.uptimeMillis()
-        if (wait <= 0) {
-            handler.removeCallbacks(drawLatest)
-            drawScheduled = false
-            drawNow()
-        } else if (!drawScheduled) {
-            // Leave the frames queued; the newest one is taken when due.
-            drawScheduled = true
-            handler.postDelayed(drawLatest, wait)
-        }
-    }
-
-    private fun drawNow() {
-        if (released) return
+        // Drain the queue FIRST, even for a frame which will be skipped.
         val image = try {
             reader.acquireLatestImage()
         } catch (e: IllegalStateException) {
+            if (!released) reportFailure("image acquisition failed", e)
             null
         } ?: return
+
         try {
-            val buffer = image.hardwareBuffer ?: return
-            buffer.use { hb ->
-                val bitmap = Bitmap.wrapHardwareBuffer(hb, null) ?: return@use
-                drawFrame(bitmap)
-                bitmap.recycle()
-                MirrorStats.onFrameDrawn()
+            if (released) return
+            MirrorStats.onFrameProduced()
+            if (!pacer.shouldDraw(SystemClock.uptimeMillis())) {
+                MirrorStats.onFrameSkipped()
+                return
             }
-            lastDrawMs = SystemClock.uptimeMillis()
+            val buffer = image.hardwareBuffer
+            if (buffer == null) {
+                MirrorStats.onFrameDrawFailure()
+                return
+            }
+            try {
+                val bitmap = Bitmap.wrapHardwareBuffer(buffer, null)
+                if (bitmap == null) {
+                    MirrorStats.onFrameDrawFailure()
+                    return
+                }
+                try {
+                    // Count a POST, not a mere draw attempt.
+                    if (drawFrame(bitmap)) {
+                        MirrorStats.onFrameDrawn()
+                    } else {
+                        MirrorStats.onFrameDrawFailure()
+                    }
+                } finally {
+                    bitmap.recycle()
+                }
+            } finally {
+                buffer.close()
+            }
         } catch (e: Exception) {
-            Log.w(TAG, "frame blit failed", e)
+            reportFailure("frame blit failed", e)
         } finally {
             image.close()
         }
     }
 
-    private fun drawFrame(bitmap: Bitmap) {
+    private fun drawFrame(bitmap: Bitmap): Boolean {
+        if (released || !target.surface.isValid) return false
         val canvas = try {
             target.surface.lockHardwareCanvas()
-        } catch (e: IllegalArgumentException) {
-            return
-        } catch (e: IllegalStateException) {
-            return
+        } catch (_: IllegalArgumentException) {
+            return false
+        } catch (_: IllegalStateException) {
+            return false
         }
         try {
             if (!fill) canvas.drawColor(Color.BLACK)
@@ -145,15 +140,46 @@ class FillRenderer(
         } finally {
             target.surface.unlockCanvasAndPost(canvas)
         }
+        return true
     }
 
+    private fun reportFailure(message: String, e: Exception) {
+        MirrorStats.onFrameDrawFailure()
+        val now = SystemClock.uptimeMillis()
+        if (now - lastErrorLogMs >= 5_000L) {
+            Log.w(TAG, message, e)
+            lastErrorLogMs = now
+        }
+    }
+
+    /**
+     * Detach the producer before calling this. Wait briefly for the renderer
+     * thread to finish using the old surface before rebinding a new renderer.
+     */
     fun release() {
+        if (released) return
         released = true
         reader.setOnImageAvailableListener(null, null)
-        handler.removeCallbacks(drawLatest)
-        handler.post {
-            reader.close()
-            thread.quitSafely()
+        val done = CountDownLatch(1)
+        val cleanup = Runnable {
+            try {
+                reader.close()
+            } catch (e: Exception) {
+                Log.w(TAG, "ImageReader close failed", e)
+            } finally {
+                thread.quitSafely()
+                done.countDown()
+            }
+        }
+        if (Looper.myLooper() == thread.looper) {
+            cleanup.run()
+        } else if (handler.post(cleanup)) {
+            if (!done.await(500L, TimeUnit.MILLISECONDS)) {
+                Log.w(TAG, "renderer cleanup timed out; driver may be blocked")
+            }
+        } else {
+            Log.w(TAG, "renderer handler stopped before cleanup")
+            cleanup.run()
         }
     }
 

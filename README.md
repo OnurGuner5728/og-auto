@@ -152,6 +152,7 @@ Ekran kareleri uygulama tarafından kaydedilmez veya geliştiriciye gönderilmez
 
 ## Sürümler
 
+- **0.8.1** — ImageReader karelerini bekletmeden tüketme, gerçek başarılı kare sayımı, başarısız çizim tanısı ve kontrollü otomatik yeniden bağlanma (oturum başına en fazla iki kez). Android Auto üzerindeki gerçek görünme durumunu telefon tek başına doğrulayamaz; donma sürerse tanı kaydını paylaşın.
 - **0.8.0** — Yansıtma tanı kaydı (kare giriş/çıkış, en uzun boşluk, ısınma) ve “Tanı kaydını paylaş” düğmesi.
 - **0.7.0** — Yansıtmada video açılınca Android Auto’nun donmasına karşı kare hızı sınırı (varsayılan 30 fps) ve düşük çözünürlüklü yakalama; araç Ayarlar’ında 30 / 24 / sınırsız seçimi.
 - **0.6.0** — Araç menüsünde YouTube’un yanına **VYPN** kısayolu: telefonda VYPN’i açıp yansıtmaya geçer.
