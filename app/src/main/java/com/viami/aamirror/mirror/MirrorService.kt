@@ -134,6 +134,7 @@ class MirrorService : LifecycleService() {
         projection = acquired
         source = LocalScreenSource(this, acquired)
         BrightnessSaver.dim(this)
+        MirrorStats.start(this)
         ScreenKeeper.start(this)
         applyLandscape()
         MirrorGateway.dispatch(MirrorEvent.ProjectionAcquired)
@@ -179,6 +180,7 @@ class MirrorService : LifecycleService() {
     override fun onDestroy() {
         RotationLock.unlock()
         ScreenKeeper.stop()
+        MirrorStats.stop()
         BrightnessSaver.restore(this)
         source?.release()
         source = null

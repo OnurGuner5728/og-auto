@@ -82,6 +82,8 @@ class LocalScreenSource(
                 maxCaptureEdge = MirrorSettings.maxCaptureEdge,
             )
             fillRenderer = renderer
+            MirrorStats.setMode("paced ${renderer.captureWidth}x${renderer.captureHeight} " +
+                "fill=$fill maxFps=${MirrorSettings.maxFps} car=${target.width}x${target.height}")
             Log.i(TAG, "paced: phone ${phoneWidth}x$phoneHeight fill=$fill onto " +
                 "car ${target.width}x${target.height}")
             // The display renders at the reduced capture size; density
@@ -91,6 +93,7 @@ class LocalScreenSource(
             retarget(renderer.captureWidth, renderer.captureHeight, dpi, renderer.surface)
         } else {
             Log.i(TAG, "fit: car ${target.width}x${target.height}")
+            MirrorStats.setMode("direct car=${target.width}x${target.height} (no frame stats)")
             retarget(target.width, target.height, target.densityDpi, target.surface)
             if (Build.VERSION.SDK_INT >= 29) previous?.release()
         }

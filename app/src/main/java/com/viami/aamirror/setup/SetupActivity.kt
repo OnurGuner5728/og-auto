@@ -66,6 +66,7 @@ class SetupActivity : ComponentActivity() {
 
         findViewById<Button>(R.id.btn_capture).setOnClickListener { requestCapture() }
         steps = SetupSteps(this, findViewById(R.id.steps_container))
+        findViewById<Button>(R.id.btn_diag).setOnClickListener { shareDiagnostics() }
         findViewById<Button>(R.id.btn_patreon).setOnClickListener {
             openLink("https://www.patreon.com/c/onurguner")
         }
@@ -228,6 +229,23 @@ class SetupActivity : ComponentActivity() {
             else -> getString(R.string.status_idle)
         }
         steps?.render()
+    }
+
+    /** Shares files/diag/mirror.log (mail, WhatsApp, Drive...). */
+    private fun shareDiagnostics() {
+        val log = com.onurguner.ogauto.mirror.MirrorStats.logFile(this)
+        if (!log.isFile || log.length() == 0L) {
+            Toast.makeText(this, R.string.diag_empty, Toast.LENGTH_LONG).show()
+            return
+        }
+        val uri = androidx.core.content.FileProvider.getUriForFile(this, "$packageName.installer", log)
+        val send = Intent(Intent.ACTION_SEND)
+            .setType("text/plain")
+            .putExtra(Intent.EXTRA_STREAM, uri)
+            .putExtra(Intent.EXTRA_SUBJECT, "OgAuto tanı kaydı")
+            .putExtra(Intent.EXTRA_EMAIL, arrayOf("onurguner.bjk@gmail.com"))
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(Intent.createChooser(send, getString(R.string.btn_diag)))
     }
 
     private fun openLink(url: String) {

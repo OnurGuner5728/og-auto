@@ -134,6 +134,9 @@ IPTV uygulamasının ayarlarında **Harici oynatıcı → OgAuto (araçta oynat)
      - **Videoyu Kaydet**, **Ekran görüntüsünün dökümünü al**, **Sesi Kaydet**, **Mikrofon Girişini Kaydet** → **kapalı**. Bunlar hata ayıklama kayıtlarıdır, oturum boyunca dosyaya yazar ve telefonu yorar.
      - **Bilinmeyen kaynaklar** ve (kablosuz kullanıyorsan) **Kablosuz Android Auto** → **açık** kalsın.
   3. Değişikliklerden sonra telefonu araçtan ayırıp yeniden bağla.
+- **Araçta yine donarsa — sebebi bulmak için:** Donduğu anda telefonda **Geliştirici seçenekleri → Hata raporu al** (son dakikaların tüm sistem kaydı). Ardından OgAuto → **Tanı kaydını paylaş**. Bu kayıt 5 saniyede bir telefonun ürettiği ve OgAuto’nun araca çizdiği kare sayısını, en uzun boşluğu ve telefonun ısınma durumunu tutar:
+  - Donma sırasında `out` kare sayısı devam ediyorsa telefon görüntü göndermeye devam ediyor demektir; sorun Android Auto / araç ünitesi tarafındadır (çözünürlüğü düşür, kablolu bağlantı dene).
+  - `in`/`out` sıfıra düşüyorsa veya `thermal` severe/critical ise telefon zorlanıyordur (kare hızını 24’e düşür, telefonu soğut, şarjdan çıkar).
 - **Yansıtmada video donuyor:** Yayını 17. adımdaki Video modunda aç. Yansıtmada kalacaksan araçta ↻ ve video çözücüyü değiştir.
 - **Siyah görüntü:** Uygulama güvenli ekran / DRM kullanıyordur; aşılmaz.
 - **Hata kaydı:** Telefon geliştirici seçenekleri → USB hata ayıklama, sonra `adb logcat -b all > ogauto.log` ve kaydı destek adresine gönder.
@@ -149,6 +152,7 @@ Ekran kareleri uygulama tarafından kaydedilmez veya geliştiriciye gönderilmez
 
 ## Sürümler
 
+- **0.8.0** — Yansıtma tanı kaydı (kare giriş/çıkış, en uzun boşluk, ısınma) ve “Tanı kaydını paylaş” düğmesi.
 - **0.7.0** — Yansıtmada video açılınca Android Auto’nun donmasına karşı kare hızı sınırı (varsayılan 30 fps) ve düşük çözünürlüklü yakalama; araç Ayarlar’ında 30 / 24 / sınırsız seçimi.
 - **0.6.0** — Araç menüsünde YouTube’un yanına **VYPN** kısayolu: telefonda VYPN’i açıp yansıtmaya geçer.
 - **0.5.0** — Uygulama içi numaralı kurulum listesi: Play Protect, bilinmeyen kaynaklar, kısıtlanmış ayarlar, erişilebilirlik, üstte gösterme, sistem ayarları, pil, bildirim, Android Auto ve telefon geliştirici ayarlarına doğrudan yönlendirme. Patreon/destek düğmeleri.

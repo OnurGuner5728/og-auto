@@ -91,6 +91,7 @@ class FillRenderer(
 
     private fun onFrame() {
         if (released) return
+        MirrorStats.onFrameProduced()
         if (intervalMs == 0L) {
             drawNow()
             return
@@ -120,6 +121,7 @@ class FillRenderer(
                 val bitmap = Bitmap.wrapHardwareBuffer(hb, null) ?: return@use
                 drawFrame(bitmap)
                 bitmap.recycle()
+                MirrorStats.onFrameDrawn()
             }
             lastDrawMs = SystemClock.uptimeMillis()
         } catch (e: Exception) {

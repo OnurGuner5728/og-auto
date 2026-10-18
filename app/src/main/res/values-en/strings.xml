@@ -139,4 +139,6 @@
   <string name="fps_row_30">30 fps — recommended; prevents Android Auto freezing on video (next connection)</string>
   <string name="fps_row_24">24 fps — try if freezing continues (next connection)</string>
   <string name="fps_row_60">Uncapped — smoothest, may freeze on some phones (next connection)</string>
+  <string name="btn_diag">Share diagnostic log (after a freeze)</string>
+  <string name="diag_empty">No log yet. Use mirroring in the car first.</string>
 </resources>
