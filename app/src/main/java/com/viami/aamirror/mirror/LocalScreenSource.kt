@@ -51,6 +51,10 @@ class LocalScreenSource(
     }
 
     override fun attach(target: SurfaceTarget) {
+        if (!target.surface.isValid) {
+            Log.w(TAG, "attach rejected: invalid car surface")
+            return
+        }
         lastTarget = target
         // The previous fill pipeline is released only after the
         // VirtualDisplay has moved off its ImageReader: releasing it first
@@ -107,7 +111,7 @@ class LocalScreenSource(
      */
     fun refresh() {
         val target = lastTarget ?: return
-        Log.i(TAG, "refresh")
+        Log.i(TAG, "refresh: resetting stalled renderer connection")
         virtualDisplay?.surface = null
         attach(target)
     }
