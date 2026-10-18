@@ -127,7 +127,13 @@ IPTV uygulamasının ayarlarında **Harici oynatıcı → OgAuto (araçta oynat)
 
 - **Araç listesinde OgAuto yok:** 6, 12, 13, 14. adımlar; telefonu araçtan ayırıp yeniden bağla.
 - **Dokunmatik çalışmıyor:** 7 ve 8. adımlar; Android bazen güncellemeden sonra erişilebilirliği kapatır.
-- **Video açınca Android Auto donuyor:** Araç Ayarlar → Yansıtma kare hızı 30 (varsayılan) veya 24 fps; bağlantıyı yenile. Android Auto geliştirici ayarlarında video çözünürlüğünü 720p yapmak da yükü azaltır.
+- **Video açınca Android Auto donuyor:** Sırayla dene:
+  1. Araç Ayarlar → **Yansıtma kare hızı** 30 (varsayılan); sürerse **24 fps**. Telefonu araçtan ayırıp yeniden bağla.
+  2. Android Auto → **Geliştirici ayarları** (ayarların en altındaki “Sürüm”e 10 kez dokun, sonra sağ üst ⋮):
+     - **Video Çözünürlüğü → 720p** seç; sürerse **480p**. (Satırın altında “Araba ve telefonun kimlik doğrulamasına izin ver” yazması Android Auto’nun çeviri hatasıdır; dokununca çözünürlük menüsü açılır.)
+     - **Videoyu Kaydet**, **Ekran görüntüsünün dökümünü al**, **Sesi Kaydet**, **Mikrofon Girişini Kaydet** → **kapalı**. Bunlar hata ayıklama kayıtlarıdır, oturum boyunca dosyaya yazar ve telefonu yorar.
+     - **Bilinmeyen kaynaklar** ve (kablosuz kullanıyorsan) **Kablosuz Android Auto** → **açık** kalsın.
+  3. Değişikliklerden sonra telefonu araçtan ayırıp yeniden bağla.
 - **Yansıtmada video donuyor:** Yayını 17. adımdaki Video modunda aç. Yansıtmada kalacaksan araçta ↻ ve video çözücüyü değiştir.
 - **Siyah görüntü:** Uygulama güvenli ekran / DRM kullanıyordur; aşılmaz.
 - **Hata kaydı:** Telefon geliştirici seçenekleri → USB hata ayıklama, sonra `adb logcat -b all > ogauto.log` ve kaydı destek adresine gönder.
