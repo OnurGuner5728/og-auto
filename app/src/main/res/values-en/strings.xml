@@ -132,12 +132,4 @@
   <string name="btn_patreon">❤ Support · Patreon</string>
   <string name="btn_support">Support: onurguner.bjk@gmail.com</string>
   <string name="setup_footer">In the car: OgAuto → Mirror, Apps or Video. The driver must not use this while driving. DRM-protected services (Netflix etc.) do not show in the car.</string>
-  <string name="menu_webtv">Web TV (your site)</string>
-  <string name="menu_webtv_short">Web TV</string>
-  <string name="webtv_section">Web TV: your stream site in the car (like YouTube TV)</string>
-  <string name="webtv_help">Enter the address of the stream site you watch. In the car, OgAuto → Web TV opens it directly on the car screen; video plays without mirroring and does not freeze. If the site needs a VPN, a device-wide VPN must be on (VPNs that only tunnel their own browser do not apply here).</string>
-  <string name="webtv_hint">Site address (e.g. example-tv.com)</string>
-  <string name="btn_webtv">Save Web TV address</string>
-  <string name="webtv_saved">Saved. In the car: OgAuto → Web TV.</string>
-  <string name="webtv_not_set">Enter the Web TV address in OgAuto on the phone</string>
 </resources>

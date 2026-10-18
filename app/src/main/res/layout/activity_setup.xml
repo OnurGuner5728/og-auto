@@ -47,33 +47,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:textStyle="bold"
-        android:text="@string/webtv_section" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:text="@string/webtv_help" />
-
-    <EditText
-        android:id="@+id/edit_webtv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/webtv_hint"
-        android:inputType="textUri"
-        android:singleLine="true" />
-
-    <Button
-        android:id="@+id/btn_webtv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_webtv" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:textStyle="bold"
         android:text="@string/video_section" />
 
     <TextView

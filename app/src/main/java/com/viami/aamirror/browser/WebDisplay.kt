@@ -46,13 +46,6 @@ val YouTubeDisplay: WebDisplay = WebDisplay(
 )
 
 /**
- * "Web TV": a stream site of the user's choice (set on the phone), drawn
- * straight onto the car screen like the YouTube TV mode, so its videos play
- * natively in the car instead of through screen mirroring.
- */
-val WebTvDisplay: WebDisplay = WebDisplay(homeUrl = "https://www.google.com")
-
-/**
  * Renders a WebView straight onto the car screen: the car Surface backs a
  * private VirtualDisplay, a Presentation shows the WebView on it, and car
  * taps/scrolls are injected into the view hierarchy as MotionEvents.
