@@ -25,6 +25,7 @@ Kablolu ve kablosuz Android Auto · root gerekmez · ücretsiz
 | **Yansıtma** | Telefon ekranını araçta yatay ve tam ekran gösterir; araç ekranından dokunma, kaydırma, hızlı kaydırma, iki parmakla yakınlaştırma, Geri / Ana ekran / Son uygulamalar. |
 | **Uygulamalar** | Telefondaki uygulamaları araçta ızgara olarak listeler; seçtiğin uygulama telefonda açılır ve araçta görünür. |
 | **Video / IPTV** | Yayını ekran yansıtması olmadan doğrudan araç ekranında oynatır (VYPN gibi uygulamalardan “harici oynatıcı”, paylaş veya M3U listesi). Yansıtmada video donması bu yolda yaşanmaz. |
+| **VYPN** | Araç menüsündeki VYPN kutusu telefonda VYPN’i açar ve doğrudan yansıtmaya geçer. |
 | **Tarayıcı / YouTube TV** | Araç ekranında web sayfası ve YouTube TV arayüzü. |
 
 > Sürücü sürüş sırasında kullanmamalıdır. Netflix, Disney+, Prime Video gibi DRM korumalı servisler araçta görünmez; bu uygulama DRM korumasını aşmaz.
@@ -141,6 +142,7 @@ Ekran kareleri uygulama tarafından kaydedilmez veya geliştiriciye gönderilmez
 
 ## Sürümler
 
+- **0.6.0** — Araç menüsünde YouTube’un yanına **VYPN** kısayolu: telefonda VYPN’i açıp yansıtmaya geçer.
 - **0.5.0** — Uygulama içi numaralı kurulum listesi: Play Protect, bilinmeyen kaynaklar, kısıtlanmış ayarlar, erişilebilirlik, üstte gösterme, sistem ayarları, pil, bildirim, Android Auto ve telefon geliştirici ayarlarına doğrudan yönlendirme. Patreon/destek düğmeleri.
 - **0.4.0** — Araçta uygulama başlatıcı (Screen2Auto tarzı), hızlı kaydırma, iki parmak yakınlaştırma, son uygulamalar; yansıtma boyunca ekran açık (Fermata yöntemi), sistem ayarıyla yatay kilit.
 - **0.3.0** — Araçta yerel Video / IPTV oynatıcı (Media3): harici oynatıcı, paylaş, M3U; HLS/DASH/RTSP/TS/MP4; yazılım çözücü seçeneği.

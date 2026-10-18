@@ -132,4 +132,7 @@
   <string name="btn_patreon">❤ Destek ol · Patreon</string>
   <string name="btn_support">Destek: onurguner.bjk@gmail.com</string>
   <string name="setup_footer">Araçta OgAuto → Yansıtma, Uygulamalar veya Video. Sürücü sürüş sırasında kullanmamalıdır. DRM korumalı servisler (Netflix vb.) araçta görünmez.</string>
+  <string name="menu_vypn">VYPN (telefonda aç + yansıt)</string>
+  <string name="menu_vypn_short">VYPN</string>
+  <string name="vypn_missing">Telefonda VYPN yüklü değil</string>
 </resources>

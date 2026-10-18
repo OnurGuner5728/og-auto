@@ -132,4 +132,7 @@
   <string name="btn_patreon">❤ Support · Patreon</string>
   <string name="btn_support">Support: onurguner.bjk@gmail.com</string>
   <string name="setup_footer">In the car: OgAuto → Mirror, Apps or Video. The driver must not use this while driving. DRM-protected services (Netflix etc.) do not show in the car.</string>
+  <string name="menu_vypn">VYPN (open on phone + mirror)</string>
+  <string name="menu_vypn_short">VYPN</string>
+  <string name="vypn_missing">VYPN is not installed on the phone</string>
 </resources>

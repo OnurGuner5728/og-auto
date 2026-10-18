@@ -49,6 +49,9 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         Mode(R.string.menu_youtube, R.string.menu_youtube_short, R.drawable.ic_cast) {
             screenManager.push(YouTubeScreen(carContext))
         },
+        Mode(R.string.menu_vypn, R.string.menu_vypn_short, R.drawable.ic_movie) {
+            openVypn()
+        },
     )
 
     init {
@@ -123,6 +126,38 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             )
             .build()
 
+    /**
+     * VYPN shortcut: start the VYPN app on the phone and go straight to the
+     * mirror, so it shows on the car screen. The TV build is used when that
+     * is the one installed.
+     */
+    private fun openVypn() {
+        val pm = carContext.packageManager
+        val intent = VYPN_PACKAGES.firstNotNullOfOrNull { pm.getLaunchIntentForPackage(it) }
+            ?: VYPN_PACKAGES.firstNotNullOfOrNull { pm.getLeanbackLaunchIntentForPackage(it) }
+        if (intent == null) {
+            androidx.car.app.CarToast.makeText(
+                carContext, carContext.getString(R.string.vypn_missing), androidx.car.app.CarToast.LENGTH_LONG,
+            ).show()
+            return
+        }
+        try {
+            carContext.applicationContext.startActivity(
+                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        } catch (e: Exception) {
+            androidx.car.app.CarToast.makeText(
+                carContext, carContext.getString(R.string.apps_launch_failed), androidx.car.app.CarToast.LENGTH_LONG,
+            ).show()
+            return
+        }
+        screenManager.push(MirrorScreen(carContext))
+    }
+
     private fun icon(iconRes: Int): CarIcon =
         CarIcon.Builder(IconCompat.createWithResource(carContext, iconRes)).build()
+
+    private companion object {
+        val VYPN_PACKAGES = listOf("net.vypn.app", "net.vypn.tv", "net.vypn.app.tv")
+    }
 }
