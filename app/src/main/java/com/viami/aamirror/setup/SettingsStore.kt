@@ -17,6 +17,7 @@ object SettingsStore {
     private const val KEY_LANDSCAPE = "autoLandscape"
     private const val KEY_LAYOUT = "menuLayout"
     private const val KEY_SW_DECODER = "softwareDecoder"
+    private const val KEY_MAX_FPS = "maxFps"
 
     fun load(context: Context) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -24,6 +25,7 @@ object SettingsStore {
         MirrorSettings.autoLandscape = prefs.getBoolean(KEY_LANDSCAPE, true)
         MirrorSettings.menuLayout = MenuLayout.fromKey(prefs.getString(KEY_LAYOUT, null))
         MirrorSettings.preferSoftwareDecoder = prefs.getBoolean(KEY_SW_DECODER, false)
+        MirrorSettings.maxFps = prefs.getInt(KEY_MAX_FPS, 30)
     }
 
     fun save(context: Context) {
@@ -33,6 +35,7 @@ object SettingsStore {
             .putBoolean(KEY_LANDSCAPE, MirrorSettings.autoLandscape)
             .putString(KEY_LAYOUT, MirrorSettings.menuLayout.key)
             .putBoolean(KEY_SW_DECODER, MirrorSettings.preferSoftwareDecoder)
+            .putInt(KEY_MAX_FPS, MirrorSettings.maxFps)
             .apply()
     }
 }

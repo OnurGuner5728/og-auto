@@ -135,4 +135,8 @@
   <string name="menu_vypn">VYPN (telefonda aç + yansıt)</string>
   <string name="menu_vypn_short">VYPN</string>
   <string name="vypn_missing">Telefonda VYPN yüklü değil</string>
+  <string name="menu_fps">Yansıtma kare hızı</string>
+  <string name="fps_row_30">30 fps — önerilen; video açınca Android Auto donmasını önler (yeni bağlantıda)</string>
+  <string name="fps_row_24">24 fps — donma sürerse dene (yeni bağlantıda)</string>
+  <string name="fps_row_60">Sınırsız — en akıcı, bazı telefonlarda donabilir (yeni bağlantıda)</string>
 </resources>

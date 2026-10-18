@@ -127,6 +127,7 @@ IPTV uygulamasının ayarlarında **Harici oynatıcı → OgAuto (araçta oynat)
 
 - **Araç listesinde OgAuto yok:** 6, 12, 13, 14. adımlar; telefonu araçtan ayırıp yeniden bağla.
 - **Dokunmatik çalışmıyor:** 7 ve 8. adımlar; Android bazen güncellemeden sonra erişilebilirliği kapatır.
+- **Video açınca Android Auto donuyor:** Araç Ayarlar → Yansıtma kare hızı 30 (varsayılan) veya 24 fps; bağlantıyı yenile. Android Auto geliştirici ayarlarında video çözünürlüğünü 720p yapmak da yükü azaltır.
 - **Yansıtmada video donuyor:** Yayını 17. adımdaki Video modunda aç. Yansıtmada kalacaksan araçta ↻ ve video çözücüyü değiştir.
 - **Siyah görüntü:** Uygulama güvenli ekran / DRM kullanıyordur; aşılmaz.
 - **Hata kaydı:** Telefon geliştirici seçenekleri → USB hata ayıklama, sonra `adb logcat -b all > ogauto.log` ve kaydı destek adresine gönder.
@@ -142,6 +143,7 @@ Ekran kareleri uygulama tarafından kaydedilmez veya geliştiriciye gönderilmez
 
 ## Sürümler
 
+- **0.7.0** — Yansıtmada video açılınca Android Auto’nun donmasına karşı kare hızı sınırı (varsayılan 30 fps) ve düşük çözünürlüklü yakalama; araç Ayarlar’ında 30 / 24 / sınırsız seçimi.
 - **0.6.0** — Araç menüsünde YouTube’un yanına **VYPN** kısayolu: telefonda VYPN’i açıp yansıtmaya geçer.
 - **0.5.0** — Uygulama içi numaralı kurulum listesi: Play Protect, bilinmeyen kaynaklar, kısıtlanmış ayarlar, erişilebilirlik, üstte gösterme, sistem ayarları, pil, bildirim, Android Auto ve telefon geliştirici ayarlarına doğrudan yönlendirme. Patreon/destek düğmeleri.
 - **0.4.0** — Araçta uygulama başlatıcı (Screen2Auto tarzı), hızlı kaydırma, iki parmak yakınlaştırma, son uygulamalar; yansıtma boyunca ekran açık (Fermata yöntemi), sistem ayarıyla yatay kilit.

@@ -135,4 +135,8 @@
   <string name="menu_vypn">VYPN (open on phone + mirror)</string>
   <string name="menu_vypn_short">VYPN</string>
   <string name="vypn_missing">VYPN is not installed on the phone</string>
+  <string name="menu_fps">Mirror frame rate</string>
+  <string name="fps_row_30">30 fps — recommended; prevents Android Auto freezing on video (next connection)</string>
+  <string name="fps_row_24">24 fps — try if freezing continues (next connection)</string>
+  <string name="fps_row_60">Uncapped — smoothest, may freeze on some phones (next connection)</string>
 </resources>

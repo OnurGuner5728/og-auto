@@ -29,6 +29,7 @@ class SettingsScreen(carContext: CarContext) : Screen(carContext) {
             .addItem(layoutRow())
             .addItem(rotationRow())
             .addItem(fillRow())
+            .addItem(fpsRow())
             .addItem(decoderRow())
             .build()
         return ListTemplate.Builder()
@@ -74,6 +75,24 @@ class SettingsScreen(carContext: CarContext) : Screen(carContext) {
             // The web modes letterbox or crop their video to match.
             BrowserDisplay.refreshVideoFit()
             YouTubeDisplay.refreshVideoFit()
+            invalidate()
+        }
+    }
+
+    /** 30 → 24 → 60 (uncapped) → 30. Applies on the next connection. */
+    private fun fpsRow(): Row {
+        val state = when (MirrorSettings.maxFps) {
+            24 -> R.string.fps_row_24
+            30 -> R.string.fps_row_30
+            else -> R.string.fps_row_60
+        }
+        return row(R.string.menu_fps, state, R.drawable.ic_play_pause) {
+            MirrorSettings.maxFps = when (MirrorSettings.maxFps) {
+                30 -> 24
+                24 -> 60
+                else -> 30
+            }
+            SettingsStore.save(carContext)
             invalidate()
         }
     }

@@ -22,7 +22,7 @@ object StatusRenderer {
     fun draw(container: SurfaceContainer, message: String) {
         val surface = container.surface ?: return
         if (!surface.isValid) return
-        if (SurfaceMode.useHardware(surface, MirrorSettings.fillScreen)) return
+        if (SurfaceMode.useHardware(surface, MirrorSettings.usesRenderer)) return
         try {
             val canvas = surface.lockCanvas(null) ?: return
             try {

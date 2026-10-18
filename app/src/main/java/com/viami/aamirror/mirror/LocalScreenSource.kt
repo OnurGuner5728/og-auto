@@ -62,10 +62,11 @@ class LocalScreenSource(
         // allows while nothing has claimed it for the CPU. When something
         // has, fall back to fit: a refused claim is a black screen at worst,
         // an honoured one would abort the process on the first frame.
-        val fill = MirrorSettings.fillScreen && Build.VERSION.SDK_INT >= 29 &&
+        val paced = Build.VERSION.SDK_INT >= 29 && MirrorSettings.usesRenderer &&
             SurfaceMode.useHardware(target.surface, true)
+        val fill = paced && MirrorSettings.fillScreen
         MirrorSettings.activeFill = fill
-        if (fill) {
+        if (paced) {
             // The old renderer still holds a hwui connection to the car
             // surface; drop it before the new one locks a hardware canvas.
             if (Build.VERSION.SDK_INT >= 29) {
@@ -74,11 +75,20 @@ class LocalScreenSource(
             }
             val (phoneWidth, phoneHeight) = PhoneDisplay.currentSize(context)
             lastPhoneSize = phoneWidth to phoneHeight
-            val renderer = FillRenderer(target, phoneWidth, phoneHeight)
+            val renderer = FillRenderer(
+                target, phoneWidth, phoneHeight,
+                fill = fill,
+                maxFps = MirrorSettings.maxFps,
+                maxCaptureEdge = MirrorSettings.maxCaptureEdge,
+            )
             fillRenderer = renderer
-            Log.i(TAG, "fill: phone ${phoneWidth}x$phoneHeight cropped onto " +
+            Log.i(TAG, "paced: phone ${phoneWidth}x$phoneHeight fill=$fill onto " +
                 "car ${target.width}x${target.height}")
-            retarget(phoneWidth, phoneHeight, target.densityDpi, renderer.surface)
+            // The display renders at the reduced capture size; density
+            // scaled with it keeps the layout identical to the phone's.
+            val dpi = (target.densityDpi * renderer.captureWidth / phoneWidth.toFloat())
+                .toInt().coerceAtLeast(120)
+            retarget(renderer.captureWidth, renderer.captureHeight, dpi, renderer.surface)
         } else {
             Log.i(TAG, "fit: car ${target.width}x${target.height}")
             retarget(target.width, target.height, target.densityDpi, target.surface)
