@@ -1,0 +1,33 @@
+package com.onurguner.ogauto.car
+
+import androidx.car.app.CarContext
+import androidx.car.app.Screen
+import androidx.car.app.model.Action
+import androidx.car.app.model.ItemList
+import androidx.car.app.model.SearchTemplate
+import androidx.car.app.model.Template
+import com.onurguner.ogauto.R
+
+/** Car-native keyboard input for a URL or a search query. */
+class SearchScreen(
+    carContext: CarContext,
+    private val onQuery: (String) -> Unit,
+) : Screen(carContext) {
+
+    override fun onGetTemplate(): Template {
+        val callback = object : SearchTemplate.SearchCallback {
+            override fun onSearchTextChanged(searchText: String) = Unit
+
+            override fun onSearchSubmitted(searchText: String) {
+                screenManager.pop()
+                onQuery(searchText)
+            }
+        }
+        return SearchTemplate.Builder(callback)
+            .setHeaderAction(Action.BACK)
+            .setSearchHint(carContext.getString(R.string.search_hint))
+            .setShowKeyboardByDefault(true)
+            .setItemList(ItemList.Builder().build())
+            .build()
+    }
+}

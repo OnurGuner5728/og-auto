@@ -1,0 +1,95 @@
+name: OgAuto APK
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['downloads/**', 'docs/**', '*.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ogauto-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - id: java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK (preinstalled on runner)
+        id: sdk
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0" > /dev/null || true
+
+      - name: Read version
+        run: echo "VER=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)" >> "$GITHUB_ENV"
+
+      - name: Decode release keystore (optional)
+        id: keys
+        env:
+          KEYSTORE_B64: ${{ secrets.OGAUTO_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/ogauto.jks"
+            echo "OGAUTO_KEYSTORE_FILE=$RUNNER_TEMP/ogauto.jks" >> "$GITHUB_ENV"
+            echo "SIGNED=release" >> "$GITHUB_ENV"
+          else
+            echo "SIGNED=debug" >> "$GITHUB_ENV"
+          fi
+
+      - name: Test and build
+        id: build
+        env:
+          OGAUTO_STORE_PASSWORD: ${{ secrets.OGAUTO_STORE_PASSWORD }}
+          OGAUTO_KEY_ALIAS: ${{ secrets.OGAUTO_KEY_ALIAS }}
+          OGAUTO_KEY_PASSWORD: ${{ secrets.OGAUTO_KEY_PASSWORD }}
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          if [ "$SIGNED" = release ]; then
+            ./gradlew --no-daemon :app:testDebugUnitTest :app:lintRelease :app:assembleRelease 2>&1 | tee "$RUNNER_TEMP/build.log"
+            cp app/build/outputs/apk/release/app-release.apk "OgAuto-$VER.apk"
+          else
+            ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleDebug 2>&1 | tee "$RUNNER_TEMP/build.log"
+            cp app/build/outputs/apk/debug/app-debug.apk "OgAuto-$VER-debug.apk"
+          fi
+
+      - name: Publish build log on failure
+        if: failure()
+        run: |
+          {
+            echo "java=${{ steps.java.outcome }} sdk=${{ steps.sdk.outcome }} keys=${{ steps.keys.outcome }} build=${{ steps.build.outcome }}"
+            java -version 2>&1 || true
+            ls "${ANDROID_HOME:-none}" 2>&1 || true
+            cat "$RUNNER_TEMP/build.log" 2>/dev/null || echo "no gradle log"
+          } > /tmp/build.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan ci-log
+          git rm -rfq . || true
+          tail -c 200000 /tmp/build.log > build.log
+          git add build.log
+          git commit -qm "CI log for ${GITHUB_SHA::7}"
+          git push -f origin HEAD:ci/ogauto-log
+
+      - name: Publish APK to the branch
+        run: |
+          mkdir -p downloads
+          rm -f downloads/OgAuto-0.[2-9]*-debug.apk downloads/OgAuto-$VER*.apk
+          mv OgAuto-$VER*.apk downloads/
+          cp downloads/OgAuto-$VER*.apk downloads/OgAuto-latest.apk
+          cd downloads && sha256sum *.apk > SHA256SUMS && cd ..
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads
+          git commit -m "Build OgAuto $VER APK ($SIGNED) from ${GITHUB_SHA::7}" || exit 0
+          git push
