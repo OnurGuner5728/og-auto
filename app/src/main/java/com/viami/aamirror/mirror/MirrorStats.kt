@@ -119,11 +119,13 @@ object MirrorStats {
             } else "?"
             val secs = INTERVAL_MS / 1000f
             write(
-                "in=%.1ffps out=%.1ffps skipped=%d failed=%d maxGap=%dms " +
-                    "sinceLastPost=%dms sinceInput=%dms thermal=%s mode=%s".format(
-                        Locale.US, p / secs, o / secs, s, f, gap,
-                        sinceLast, sinceInput, thermal, mode,
-                    )
+                String.format(
+                    Locale.US,
+                    "in=%.1ffps out=%.1ffps skipped=%d failed=%d maxGap=%dms " +
+                        "sinceLastPost=%dms sinceInput=%dms thermal=%s mode=%s",
+                    p / secs, o / secs, s, f, gap,
+                    sinceLast, sinceInput, thermal, mode,
+                )
             )
             if (pacedMode && MirrorRecoveryPolicy.shouldRebind(
                     now, modeStartedMs.get(), lastInputMs.get(),
