@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.onurguner.ogauto.R
 import com.onurguner.ogauto.browser.BrowserDisplay
+import com.onurguner.ogauto.browser.WebTvDisplay
 import com.onurguner.ogauto.car.SurfaceRouter
 import com.onurguner.ogauto.core.Channel
 import com.onurguner.ogauto.core.M3uParser
@@ -71,6 +72,19 @@ class SetupActivity : ComponentActivity() {
         }
         findViewById<Button>(R.id.btn_support).setOnClickListener {
             openLink("mailto:onurguner.bjk@gmail.com?subject=OgAuto")
+        }
+        val webTvField = findViewById<EditText>(R.id.edit_webtv)
+        webTvField.setText(WebTvStore.url(this))
+        findViewById<Button>(R.id.btn_webtv).setOnClickListener {
+            val url = webTvField.text.toString().trim()
+            if (url.isEmpty()) {
+                Toast.makeText(this, R.string.video_no_link, Toast.LENGTH_LONG).show()
+            } else {
+                WebTvStore.setUrl(this, url)
+                // Already showing in the car: switch right away.
+                if (WebTvDisplay.isAttached) WebTvDisplay.loadUrl(UrlResolver.resolve(url))
+                Toast.makeText(this, R.string.webtv_saved, Toast.LENGTH_LONG).show()
+            }
         }
         val playlistField = findViewById<EditText>(R.id.edit_playlist)
         playlistField.setText(PlaylistStore.url(this))

@@ -132,4 +132,12 @@
   <string name="btn_patreon">❤ Destek ol · Patreon</string>
   <string name="btn_support">Destek: onurguner.bjk@gmail.com</string>
   <string name="setup_footer">Araçta OgAuto → Yansıtma, Uygulamalar veya Video. Sürücü sürüş sırasında kullanmamalıdır. DRM korumalı servisler (Netflix vb.) araçta görünmez.</string>
+  <string name="menu_webtv">Web TV (kendi siten)</string>
+  <string name="menu_webtv_short">Web TV</string>
+  <string name="webtv_section">Web TV: kendi yayın siten araçta (YouTube TV gibi)</string>
+  <string name="webtv_help">İzlediğin yayın sitesinin adresini yaz. Araçta OgAuto → Web TV bu sayfayı doğrudan araç ekranında açar; video yansıtma olmadan oynar, donmaz. Site VPN istiyorsa telefonda tüm cihazı kapsayan bir VPN açık olmalı (yalnızca kendi tarayıcısını tünelleyen VPN’ler buraya yansımaz).</string>
+  <string name="webtv_hint">Site adresi (ör. ornek-tv.com)</string>
+  <string name="btn_webtv">Web TV adresini kaydet</string>
+  <string name="webtv_saved">Kaydedildi. Araçta OgAuto → Web TV.</string>
+  <string name="webtv_not_set">Telefonda OgAuto → Web TV adresini gir</string>
 </resources>

@@ -49,6 +49,9 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         Mode(R.string.menu_youtube, R.string.menu_youtube_short, R.drawable.ic_cast) {
             screenManager.push(YouTubeScreen(carContext))
         },
+        Mode(R.string.menu_webtv, R.string.menu_webtv_short, R.drawable.ic_movie) {
+            screenManager.push(WebTvScreen(carContext))
+        },
     )
 
     init {
