@@ -18,6 +18,7 @@ import androidx.car.app.model.ItemList
 import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
 import com.onurguner.ogauto.R
+import com.onurguner.ogauto.core.PerfTrace
 import com.onurguner.ogauto.core.CarLaunchPolicy
 import com.onurguner.ogauto.core.MirrorGateway
 
@@ -34,6 +35,7 @@ class AppsScreen(
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
 
     override fun onGetTemplate(): Template {
+        val started = PerfTrace.now()
         val apps = loadApps()
         val limit = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
@@ -68,6 +70,7 @@ class AppsScreen(
             .setTitle(carContext.getString(R.string.menu_apps))
             .setHeaderAction(Action.BACK)
             .build()
+            .also { PerfTrace.log("apps_template", started) }
     }
 
     private fun launch(app: AppEntry) {

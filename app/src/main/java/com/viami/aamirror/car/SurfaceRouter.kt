@@ -4,6 +4,7 @@ import androidx.car.app.AppManager
 import androidx.car.app.CarContext
 import androidx.car.app.SurfaceCallback
 import androidx.car.app.SurfaceContainer
+import com.onurguner.ogauto.core.PerfTrace
 
 /** A mode that can own the car surface (screen mirroring, browser, ...). */
 interface SurfaceSink {
@@ -64,9 +65,11 @@ object SurfaceRouter {
     /** Swaps the surface owner; no-op when the sink is already active. */
     fun setSink(newSink: SurfaceSink?) {
         if (newSink === sink) return
+        val started = PerfTrace.now()
         sink?.onDetach()
         sink = newSink
         val current = container ?: return
         newSink?.onAttach(current)
+        PerfTrace.log("surface_sink_switch", started)
     }
 }
