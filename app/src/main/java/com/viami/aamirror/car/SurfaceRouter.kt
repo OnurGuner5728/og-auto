@@ -29,11 +29,18 @@ object SurfaceRouter {
 
     private val callback = object : SurfaceCallback {
         override fun onSurfaceAvailable(surfaceContainer: SurfaceContainer) {
+            val old = container
+            if (old?.surface === surfaceContainer.surface &&
+                old.width == surfaceContainer.width &&
+                old.height == surfaceContainer.height &&
+                old.dpi == surfaceContainer.dpi) return
+            if (old != null) sink?.onDetach()
             container = surfaceContainer
             sink?.onAttach(surfaceContainer)
         }
 
         override fun onSurfaceDestroyed(surfaceContainer: SurfaceContainer) {
+            if (container?.surface !== surfaceContainer.surface) return
             sink?.onDetach()
             container = null
         }

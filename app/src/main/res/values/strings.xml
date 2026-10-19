@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">OgAuto</string>
+  <string name="app_name">OgAuto V2 Transitions</string>
   <string name="notification_channel">Yansıtma etkin</string>
   <string name="notification_mirroring">Telefon ekranı paylaşılıyor</string>
   <string name="notification_stop">Durdur</string>
