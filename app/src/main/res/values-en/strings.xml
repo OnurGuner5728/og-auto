@@ -147,4 +147,5 @@
   <string name="step_autostart">Xiaomi autostart</string>
   <string name="step_autostart_help">Xiaomi/POCO: Allow OgAuto in Security → Permissions → Autostart and set battery to Unrestricted. Android controls accessibility permission.</string>
   <string name="accessibility_enabled_not_bound">Accessibility permission is on but the touch service is not connected. Check Xiaomi autostart and battery settings.</string>
+  <string name="apps_loading">Preparing apps…</string>
 </resources>

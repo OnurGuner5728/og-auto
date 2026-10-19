@@ -6,6 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.Executors
 import androidx.car.app.CarContext
 import androidx.car.app.CarToast
 import androidx.car.app.Screen
@@ -48,6 +51,9 @@ class AppsScreen(
             items.addItem(navItem(R.string.apps_manual_mirror, R.drawable.ic_cast) {
                 screenManager.push(MirrorScreen(carContext))
             })
+        }
+        if (apps.isEmpty() && loading) {
+            items.addItem(navItem(R.string.apps_loading, R.drawable.ic_grid) { })
         }
         apps.drop(start).take(perPage).forEach { app ->
             items.addItem(
@@ -92,26 +98,34 @@ class AppsScreen(
         }
     }
 
+    /** Never decode all launcher icons synchronously in onGetTemplate(). */
     private fun loadApps(): List<AppEntry> {
         cache?.let { return it }
+        synchronized(AppsScreen::class.java) {
+            if (loading) return emptyList()
+            loading = true
+        }
         val pm = carContext.packageManager
-        val query = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val list = pm.queryIntentActivities(query, PackageManager.MATCH_ALL)
-            .asSequence()
-            .map { it.activityInfo }
-            .filter { it.packageName != carContext.packageName }
-            .distinctBy { it.packageName }
-            .map { info ->
-                AppEntry(
-                    label = info.loadLabel(pm).toString(),
-                    pkg = info.packageName,
-                    icon = CarIcon.Builder(IconCompat.createWithBitmap(toBitmap(info.loadIcon(pm)))).build(),
-                )
+        val myPackage = carContext.packageName
+        executor.execute {
+            val result = runCatching {
+                val query = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+                pm.queryIntentActivities(query, PackageManager.MATCH_ALL)
+                    .asSequence().map { it.activityInfo }
+                    .filter { it.packageName != myPackage }.distinctBy { it.packageName }
+                    .map { info ->
+                        AppEntry(info.loadLabel(pm).toString(), info.packageName,
+                            CarIcon.Builder(IconCompat.createWithBitmap(toBitmap(info.loadIcon(pm)))).build())
+                    }
+                    .sortedBy { it.label.lowercase() }.toList()
+            }.onFailure { Log.w(TAG, "async app scan failed", it) }.getOrDefault(emptyList())
+            cache = result
+            loading = false
+            Handler(Looper.getMainLooper()).post {
+                if (lifecycle.currentState != androidx.lifecycle.Lifecycle.State.DESTROYED) invalidate()
             }
-            .sortedBy { it.label.lowercase() }
-            .toList()
-        cache = list
-        return list
+        }
+        return emptyList()
     }
 
     private fun toBitmap(d: Drawable): Bitmap {
@@ -135,6 +149,10 @@ class AppsScreen(
         const val MIRROR_MARKER = "mirror"
 
         /** Icons are expensive to render; built once per process. */
-        private var cache: List<AppEntry>? = null
+        @Volatile private var cache: List<AppEntry>? = null
+        @Volatile private var loading: Boolean = false
+        private val executor = Executors.newSingleThreadExecutor { task ->
+            Thread(task, "ogauto-app-icons").apply { isDaemon = true }
+        }
     }
 }
