@@ -75,6 +75,9 @@ class MirrorScreen(carContext: CarContext, private val mediaControls: Boolean = 
 
     override fun onStart(owner: LifecycleOwner) {
         SurfaceRouter.setSink(sink)
+        if (MirrorGateway.state.value.projection == ProjectionStatus.NONE) {
+            CarToast.makeText(carContext, carContext.getString(R.string.car_capture_manual), CarToast.LENGTH_LONG).show()
+        }
     }
 
     override fun onGetTemplate(): Template {
