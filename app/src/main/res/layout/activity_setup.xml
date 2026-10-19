@@ -37,6 +37,42 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:text="@string/v3_split_config_title" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:text="@string/v3_split_config_help" />
+
+    <EditText
+        android:id="@+id/edit_v3_left_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textUri"
+        android:singleLine="true"
+        android:hint="@string/v3_split_left" />
+
+    <EditText
+        android:id="@+id/edit_v3_right_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textUri"
+        android:singleLine="true"
+        android:hint="@string/v3_split_right" />
+
+    <Button
+        android:id="@+id/btn_v3_save_urls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/v3_split_save" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textSize="17sp"
         android:textStyle="bold"
@@ -60,7 +96,7 @@
         android:id="@+id/btn_capture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btn_capture" />
+        android:text="@string/v3_manual_capture" />
 
     <TextView
         android:layout_width="match_parent"

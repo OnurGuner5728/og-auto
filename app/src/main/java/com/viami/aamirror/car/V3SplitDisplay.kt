@@ -71,12 +71,12 @@ internal object V3SplitDisplay {
             presentation = show
             val layout = LinearLayout(show.context).apply { setBackgroundColor(Color.BLACK) }
             root = layout
-            val first = makeWeb(show.context, browserUrl, 0)
+            val first = makeWeb(show.context, com.onurguner.ogauto.core.V3SplitPrefs.left(context), 0)
             val second = if (showVideo && VideoPlayback.current != null) {
                 makeVideo(show.context)
             } else {
                 showVideo = false
-                makeWeb(show.context, youtubeUrl, 1)
+                makeWeb(show.context, com.onurguner.ogauto.core.V3SplitPrefs.right(context), 1)
             }
             panes.add(first)
             panes.add(second)
@@ -96,6 +96,8 @@ internal object V3SplitDisplay {
             javaScriptEnabled = true
             domStorageEnabled = true
             mediaPlaybackRequiresUserGesture = true
+            allowFileAccess = false
+            allowContentAccess = false
             useWideViewPort = true
             loadWithOverviewMode = true
         }
@@ -171,7 +173,7 @@ internal object V3SplitDisplay {
         stopVideo()
         val replacement = if (showVideo) {
             makeVideo(layout.context)
-        } else makeWeb(layout.context, youtubeUrl, 1)
+        } else makeWeb(layout.context, com.onurguner.ogauto.core.V3SplitPrefs.right(layout.context), 1)
         panes.add(targetIndex, replacement)
         rebuild()
     }

@@ -175,4 +175,12 @@
     <string name="v3_external_failed">Cannot launch this app on the secondary display. Open on phone or use optional mirroring.</string>
     <string name="v3_picker_empty">No selected apps — open OgAuto on your phone</string>
     <string name="v3_picker_phone_help">On phone: OgAuto → Select apps; then reopen the car apps menu.</string>
+    <string name="v3_split_config_title">Split panes — web content</string>
+    <string name="v3_split_config_help">Configure separate left and right web URLs. Defaults to the Maps website and YouTube TV. These are not embedded native Android apps.</string>
+    <string name="v3_split_left">Left pane URL (e.g. Maps)</string>
+    <string name="v3_split_right">Right pane URL (e.g. YouTube TV)</string>
+    <string name="v3_split_save">Save pane URLs</string>
+    <string name="v3_split_saved">Pane URLs saved for the next opening.</string>
+    <string name="v3_split_invalid_url">Use valid http:// or https:// URLs only.</string>
+    <string name="v3_manual_capture">Advanced: optional manual screen capture</string>
 </resources>

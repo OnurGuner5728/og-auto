@@ -68,6 +68,19 @@ class SetupActivity : ComponentActivity() {
         findViewById<Button>(R.id.btn_v3_picker).setOnClickListener {
             startActivity(Intent(this, V3AppPickerActivity::class.java))
         }
+        val leftUrl = findViewById<EditText>(R.id.edit_v3_left_url)
+        val rightUrl = findViewById<EditText>(R.id.edit_v3_right_url)
+        leftUrl.setText(com.onurguner.ogauto.core.V3SplitPrefs.left(this))
+        rightUrl.setText(com.onurguner.ogauto.core.V3SplitPrefs.right(this))
+        findViewById<Button>(R.id.btn_v3_save_urls).setOnClickListener {
+            val left = leftUrl.text.toString().trim()
+            val right = rightUrl.text.toString().trim()
+            if (com.onurguner.ogauto.core.V3SplitPrefs.save(this, left, right)) {
+                Toast.makeText(this, R.string.v3_split_saved, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, R.string.v3_split_invalid_url, Toast.LENGTH_LONG).show()
+            }
+        }
         steps = SetupSteps(this, findViewById(R.id.steps_container))
         findViewById<Button>(R.id.btn_diag).setOnClickListener { shareDiagnostics() }
         findViewById<Button>(R.id.btn_patreon).setOnClickListener {

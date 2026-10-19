@@ -40,12 +40,6 @@ class SetupSteps(private val activity: Activity, private val container: LinearLa
     )
 
     private val steps: List<Step> = listOf(
-        Step(R.string.step_protect, R.string.step_protect_help, R.string.step_protect_btn,
-            { State.CHECK }) { openPlayProtect() },
-        Step(R.string.step_unknown, R.string.step_unknown_help, R.string.step_open,
-            { if (Build.VERSION.SDK_INT < 26 || activity.packageManager.canRequestPackageInstalls()) State.DONE else State.TODO }) {
-            open(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, pkgUri()))
-        },
         Step(R.string.step_aa_install, R.string.step_aa_install_help, R.string.btn_install_aa,
             { if (InstallerHelper.isPlayInstalled(activity)) State.DONE else State.TODO }) {
             InstallerHelper.start(activity)
@@ -63,29 +57,8 @@ class SetupSteps(private val activity: Activity, private val container: LinearLa
                     else -> State.TODO
                 }
             }) { openAccessibility() },
-        Step(R.string.step_autostart, R.string.step_autostart_help, R.string.step_open,
-            { if (isXiaomiFamily()) State.CHECK else State.DONE }) { openAutoStartSettings() },
-        Step(R.string.step_overlay, R.string.step_overlay_help, R.string.step_open,
-            { if (Settings.canDrawOverlays(activity)) State.DONE else State.TODO }) {
-            open(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, pkgUri()))
-        },
-        Step(R.string.step_write_settings, R.string.step_write_settings_help, R.string.step_open,
-            { if (Settings.System.canWrite(activity)) State.DONE else State.TODO }) {
-            open(Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, pkgUri()))
-        },
-        Step(R.string.step_battery, R.string.step_battery_help, R.string.step_open,
-            { if (batteryUnrestricted()) State.DONE else State.TODO }) { openBattery() },
-        Step(R.string.step_notifications, R.string.step_notifications_help, R.string.step_open,
-            { if (notificationsAllowed()) State.DONE else State.TODO }) {
-            if (Build.VERSION.SDK_INT >= 26) {
-                open(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                    .putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName))
-            }
-        },
         Step(R.string.step_aa_dev, R.string.step_aa_dev_help, R.string.btn_aa_settings,
             { State.CHECK }) { InstallerHelper.openAndroidAutoSettings(activity) },
-        Step(R.string.step_phone_dev, R.string.step_phone_dev_help, R.string.step_open,
-            { State.CHECK }) { openPhoneDeveloperOptions() },
     )
 
     fun render() {

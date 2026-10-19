@@ -175,4 +175,12 @@
     <string name="v3_external_failed">Bu uygulama ikinci ekranda başlatılamadı. Telefonda açma veya manuel yansıtmayı kullan.</string>
     <string name="v3_picker_empty">Henüz uygulama seçilmedi — telefondan OgAuto uygulamasını aç</string>
     <string name="v3_picker_phone_help">Telefonda OgAuto → Uygulamalarını seç. Ardından araç menüsünü yeniden aç.</string>
+    <string name="v3_split_config_title">Çift panel — web içerikleri</string>
+    <string name="v3_split_config_help">Sol ve sağ panel için iki ayrı web adresi belirle. Varsayılan: Haritalar web sitesi + YouTube TV. Bu paneller yerel Android uygulamalarını gömmez.</string>
+    <string name="v3_split_left">Sol panel URL (ör. Haritalar)</string>
+    <string name="v3_split_right">Sağ panel URL (ör. YouTube TV)</string>
+    <string name="v3_split_save">Panel adreslerini kaydet</string>
+    <string name="v3_split_saved">Panel adresleri kaydedildi. Sonraki açılışta uygulanır.</string>
+    <string name="v3_split_invalid_url">Yalnızca geçerli http:// veya https:// adresi kullan.</string>
+    <string name="v3_manual_capture">Gelişmiş: manuel ekran paylaşımı (isteğe bağlı)</string>
 </resources>
