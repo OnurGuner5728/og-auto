@@ -6,6 +6,11 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.Log
+import com.onurguner.ogauto.core.RecentApps
+import com.onurguner.ogauto.core.PerfTrace
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.Executors
 import androidx.car.app.CarContext
 import androidx.car.app.CarToast
 import androidx.car.app.Screen
@@ -18,6 +23,7 @@ import androidx.car.app.model.ItemList
 import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
 import com.onurguner.ogauto.R
+import com.onurguner.ogauto.car.FavoritesStore
 import com.onurguner.ogauto.core.CarLaunchPolicy
 import com.onurguner.ogauto.core.MirrorGateway
 
@@ -34,12 +40,17 @@ class AppsScreen(
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
 
     override fun onGetTemplate(): Template {
-        val apps = loadApps()
+        val started = PerfTrace.now()
+        val favorites = FavoritesStore.get(carContext)
+        // Stable sorting keeps recently opened apps above alphabetical peers,
+        // but all explicitly selected favorites still come first.
+        val recentlyOrdered = RecentApps.order(carContext, loadApps()) { it.pkg }
+        val apps = recentlyOrdered.sortedWith(compareBy<AppEntry> { if (it.pkg in favorites) 0 else 1 })
         val limit = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_GRID)
         }.getOrDefault(12).coerceAtLeast(4)
-        val perPage = (limit - 3).coerceAtLeast(1)
+        val perPage = (limit - 4).coerceAtLeast(1)
         val start = page * perPage
         val items = ItemList.Builder()
         if (page > 0) {
@@ -49,12 +60,26 @@ class AppsScreen(
                 screenManager.push(MirrorScreen(carContext))
             })
         }
+        if (page == 0) {
+            items.addItem(navItem(R.string.favorites_edit, R.drawable.ic_grid) {
+                choosingFavorites = !choosingFavorites
+                invalidate()
+            })
+        }
+        if (apps.isEmpty() && loading) {
+            items.addItem(navItem(R.string.apps_loading, R.drawable.ic_grid) { })
+        }
         apps.drop(start).take(perPage).forEach { app ->
             items.addItem(
                 GridItem.Builder()
-                    .setTitle(app.label)
+                    .setTitle(if (app.pkg in favorites) "★ " + app.label else app.label)
                     .setImage(app.icon)
-                    .setOnClickListener { launch(app) }
+                    .setOnClickListener {
+                        if (choosingFavorites) {
+                            FavoritesStore.toggle(carContext, app.pkg)
+                            invalidate()
+                        } else launch(app)
+                    }
                     .build()
             )
         }
@@ -68,6 +93,7 @@ class AppsScreen(
             .setTitle(carContext.getString(R.string.menu_apps))
             .setHeaderAction(Action.BACK)
             .build()
+            .also { PerfTrace.log("apps_template", started) }
     }
 
     private fun launch(app: AppEntry) {
@@ -78,6 +104,7 @@ class AppsScreen(
             // Allowed from the background: OgAuto holds an enabled
             // accessibility service / overlay permission.
             carContext.applicationContext.startActivity(intent)
+            RecentApps.record(carContext, app.pkg)
         } catch (e: Exception) {
             Log.w(TAG, "launch ${app.pkg} failed", e)
             CarToast.makeText(carContext, carContext.getString(R.string.apps_launch_failed), CarToast.LENGTH_LONG).show()
@@ -92,30 +119,38 @@ class AppsScreen(
         }
     }
 
+    /** Never decode all launcher icons synchronously in onGetTemplate(). */
     private fun loadApps(): List<AppEntry> {
         cache?.let { return it }
+        synchronized(AppsScreen::class.java) {
+            if (loading) return emptyList()
+            loading = true
+        }
         val pm = carContext.packageManager
-        val query = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val list = pm.queryIntentActivities(query, PackageManager.MATCH_ALL)
-            .asSequence()
-            .map { it.activityInfo }
-            .filter { it.packageName != carContext.packageName }
-            .distinctBy { it.packageName }
-            .map { info ->
-                AppEntry(
-                    label = info.loadLabel(pm).toString(),
-                    pkg = info.packageName,
-                    icon = CarIcon.Builder(IconCompat.createWithBitmap(toBitmap(info.loadIcon(pm)))).build(),
-                )
+        val myPackage = carContext.packageName
+        executor.execute {
+            val result = runCatching {
+                val query = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+                pm.queryIntentActivities(query, PackageManager.MATCH_ALL)
+                    .asSequence().map { it.activityInfo }
+                    .filter { it.packageName != myPackage }.distinctBy { it.packageName }
+                    .map { info ->
+                        AppEntry(info.loadLabel(pm).toString(), info.packageName,
+                            CarIcon.Builder(IconCompat.createWithBitmap(toBitmap(info.loadIcon(pm)))).build())
+                    }
+                    .sortedBy { it.label.lowercase() }.toList()
+            }.onFailure { Log.w(TAG, "async app scan failed", it) }.getOrDefault(emptyList())
+            cache = result
+            loading = false
+            Handler(Looper.getMainLooper()).post {
+                if (lifecycle.currentState != androidx.lifecycle.Lifecycle.State.DESTROYED) invalidate()
             }
-            .sortedBy { it.label.lowercase() }
-            .toList()
-        cache = list
-        return list
+        }
+        return emptyList()
     }
 
     private fun toBitmap(d: Drawable): Bitmap {
-        val size = 96
+        val size = 72
         val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         d.setBounds(0, 0, size, size)
@@ -135,6 +170,14 @@ class AppsScreen(
         const val MIRROR_MARKER = "mirror"
 
         /** Icons are expensive to render; built once per process. */
-        private var cache: List<AppEntry>? = null
+        @Volatile private var cache: List<AppEntry>? = null
+        @Volatile private var choosingFavorites: Boolean = false
+
+        /** Discard icon bitmaps when the system reports memory pressure. */
+        fun clearCache() { cache = null }
+        @Volatile private var loading: Boolean = false
+        private val executor = Executors.newSingleThreadExecutor { task ->
+            Thread(task, "ogauto-app-icons").apply { isDaemon = true }
+        }
     }
 }

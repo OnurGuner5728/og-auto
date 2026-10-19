@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.Display
 import android.view.Surface
 import com.onurguner.ogauto.core.MirrorSettings
+import com.onurguner.ogauto.core.PerfTrace
 
 /**
  * Mirrors the phone screen onto the car surface through a VirtualDisplay.
@@ -51,6 +52,7 @@ class LocalScreenSource(
     }
 
     override fun attach(target: SurfaceTarget) {
+        val started = PerfTrace.now()
         if (!target.surface.isValid) {
             Log.w(TAG, "attach rejected: invalid car surface")
             return
@@ -101,6 +103,7 @@ class LocalScreenSource(
             retarget(target.width, target.height, target.densityDpi, target.surface)
             if (Build.VERSION.SDK_INT >= 29) previous?.release()
         }
+        PerfTrace.log("mirror_surface_attach", started)
     }
 
     /**
@@ -140,6 +143,8 @@ class LocalScreenSource(
     }
 
     override fun detach() {
+        // Do not refresh an abandoned surface while the host reconnects.
+        lastTarget = null
         virtualDisplay?.surface = null
         MirrorSettings.activeFill = false
         // fillRenderer is only ever created on SDK_INT >= 29 (see attach()).
