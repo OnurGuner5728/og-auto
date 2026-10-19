@@ -18,6 +18,7 @@ import androidx.car.app.model.ItemList
 import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
 import com.onurguner.ogauto.R
+import com.onurguner.ogauto.car.FavoritesStore
 import com.onurguner.ogauto.core.CarLaunchPolicy
 import com.onurguner.ogauto.core.MirrorGateway
 
@@ -31,15 +32,18 @@ class AppsScreen(
     private val page: Int = 0,
 ) : Screen(carContext) {
 
+    private var choosingFavorites = false
+
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
 
     override fun onGetTemplate(): Template {
-        val apps = loadApps()
+        val favorites = FavoritesStore.get(carContext)
+        val apps = loadApps().sortedWith(compareBy<AppEntry> { if (it.pkg in favorites) 0 else 1 }.thenBy { it.label.lowercase() })
         val limit = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_GRID)
         }.getOrDefault(12).coerceAtLeast(4)
-        val perPage = (limit - 3).coerceAtLeast(1)
+        val perPage = (limit - 4).coerceAtLeast(1)
         val start = page * perPage
         val items = ItemList.Builder()
         if (page > 0) {
@@ -49,12 +53,23 @@ class AppsScreen(
                 screenManager.push(MirrorScreen(carContext))
             })
         }
+        if (page == 0) {
+            items.addItem(navItem(R.string.favorites_edit, R.drawable.ic_grid) {
+                choosingFavorites = !choosingFavorites
+                invalidate()
+            })
+        }
         apps.drop(start).take(perPage).forEach { app ->
             items.addItem(
                 GridItem.Builder()
-                    .setTitle(app.label)
+                    .setTitle(if (app.pkg in favorites) "★ " + app.label else app.label)
                     .setImage(app.icon)
-                    .setOnClickListener { launch(app) }
+                    .setOnClickListener {
+                        if (choosingFavorites) {
+                            FavoritesStore.toggle(carContext, app.pkg)
+                            invalidate()
+                        } else launch(app)
+                    }
                     .build()
             )
         }

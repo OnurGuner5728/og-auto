@@ -21,7 +21,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 10
-        versionName = "0.8.2"
+        versionName = "0.8.2-v2-favorites"
     }
 
     signingConfigs {
@@ -44,6 +44,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".v2.favorites"
+        }
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.findByName("release")
