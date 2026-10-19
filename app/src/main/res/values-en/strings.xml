@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">OgAuto</string>
+  <string name="app_name">OgAuto V2 ALL</string>
   <string name="notification_channel">Mirroring active</string>
   <string name="notification_mirroring">Screen sharing in progress</string>
   <string name="notification_stop">Stop</string>
@@ -147,4 +147,6 @@
   <string name="step_autostart">Xiaomi autostart</string>
   <string name="step_autostart_help">Xiaomi/POCO: Allow OgAuto in Security → Permissions → Autostart and set battery to Unrestricted. Android controls accessibility permission.</string>
   <string name="accessibility_enabled_not_bound">Accessibility permission is on but the touch service is not connected. Check Xiaomi autostart and battery settings.</string>
+  <string name="apps_loading">Preparing apps…</string>
+  <string name="favorites_edit">★ Edit favorites</string>
 </resources>

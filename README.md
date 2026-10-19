@@ -1,3 +1,23 @@
+# OgAuto V2 — Birleşik Deney Sürümü
+
+**Bu dal yalnızca test içindir.** [Normal OgAuto 0.8.2](https://github.com/OnurGuner5728/og-auto/tree/main) değişmemiştir.
+
+**APK:** [OgAuto-0.8.2-v2-all-debug.apk](https://github.com/OnurGuner5728/og-auto/raw/experiment/v2-all/downloads/OgAuto-0.8.2-v2-all-debug.apk)
+
+Bu APK 11 ayrı V2 deneyini birleştirir: arka planda uygulama simgesi hazırlama, dokunmatik jest birleştirme, GPU çizim bütçesi, mod/surface geçişi, video çözücü hata durumunda yazılıma geçiş, simge belleği azaltma, yeniden bağlanma, son uygulamalar/kanal, kamera sonrası son ekran geri yükleme, favoriler ve performans kayıtları.
+
+**Ayrı kurulur:** Paket adı `com.onurguner.ogauto.v2.all`. Orijinal OgAuto'yu kaldırmak gerekmez. Ancak erişilebilirlik ve Android Auto kurulum izinleri V2 için ayrı verilebilir. Aynı anda iki OgAuto varyantının servisini etkinleştirmeyin.
+
+**Kamera test sınırı:** Son ekranın geri yüklenmesi, aracın Android Auto oturumunu yeniden oluşturmasına bağlıdır; Android Auto tamamen sonlandırılırsa veya sistem yeniden ekran paylaşım izni isterse V2 bunu gizlice açamaz. Kamera sırasında Android Auto yüzeyinin kaybolması halinde yüzey dönüşünde yeniden bağlanma denenir.
+
+**Performans kaydı:** `adb logcat -s OgAutoPerf OgAutoSurface OgAutoTouch MirrorRenderer` ile incelenebilir.
+
+**Test sırası:** V2 Uygulamalar menüsü → favoriler ve son kullanılanlar → dokunmatik → YouTube/Tarayıcı/Video geçişleri → IPTV kanal değişimi → ekran paylaşımı (manuel) → geri görüş kamerası → kabloyu çıkar-tak. Her adımda 0.8.2 ile aynı senaryoyu karşılaştırın.
+
+**Bu dalı ana dala birleştirmeyin; araç testlerinden sonra karar verin.**
+
+---
+
 <div align="center">
 
 # OgAuto
