@@ -65,6 +65,8 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
     override fun onStart(owner: LifecycleOwner) {
         SurfaceRouter.setSink(null)
+        // A deliberate return to Home clears stale camera restore tickets.
+        CameraResumeStore.clear(carContext)
         // The settings screen may have changed the layout while we were away.
         invalidate()
     }

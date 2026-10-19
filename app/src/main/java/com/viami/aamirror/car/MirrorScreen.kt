@@ -80,6 +80,10 @@ class MirrorScreen(carContext: CarContext, private val mediaControls: Boolean = 
         }
     }
 
+    override fun onStop(owner: LifecycleOwner) {
+        CameraResumeStore.mark(carContext, "mirror")
+    }
+
     override fun onGetTemplate(): Template {
         val strip = ActionStrip.Builder()
             .addAction(action(R.drawable.ic_menu) { screenManager.pop() })

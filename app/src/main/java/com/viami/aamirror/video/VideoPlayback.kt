@@ -122,6 +122,26 @@ object VideoPlayback {
 
     fun playIndex(i: Int) = onMain { playIndexNow(i) }
 
+    /** Re-create playback after a car-camera interruption destroyed the Session. */
+    fun restoreAfterInterruption(context: Context) {
+        init(context)
+        val remembered = context.getSharedPreferences("video", Context.MODE_PRIVATE).getInt("last_channel_index", -1)
+        if (remembered < 0) return
+        if (_channels.value.isNotEmpty()) {
+            onMain { if (player == null && remembered in _channels.value.indices) playIndexNow(remembered) }
+        } else {
+            Thread({
+                val channels = PlaylistStore.cached(context)
+                onMain {
+                    if (player == null && remembered in channels.indices) {
+                        _channels.value = channels
+                        playIndexNow(remembered)
+                    }
+                }
+            }, "ogauto-camera-resume").start()
+        }
+    }
+
     fun next() = onMain {
         val n = _channels.value.size
         if (n > 0) playIndexNow((_index.value + 1).mod(n))
@@ -167,6 +187,7 @@ object VideoPlayback {
         val channel = _channels.value.getOrNull(i) ?: return
         val context = appContext ?: return
         _index.value = i
+        context.getSharedPreferences("video", Context.MODE_PRIVATE).edit().putInt("last_channel_index", i).apply()
         retries = 0
         val p = player ?: buildPlayer()
         val headers = channel.headers.toMutableMap()

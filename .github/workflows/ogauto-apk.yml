@@ -2,7 +2,7 @@ name: OgAuto APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'experiment/v2-*']
     paths-ignore: ['downloads/**', 'docs/**', '*.md']
   pull_request:
     branches: [main]
@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ogauto-apk
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
