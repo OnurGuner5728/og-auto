@@ -22,7 +22,7 @@ object SettingsStore {
     fun load(context: Context) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         MirrorSettings.fillScreen = prefs.getBoolean(KEY_FILL, true)
-        MirrorSettings.autoLandscape = prefs.getBoolean(KEY_LANDSCAPE, true)
+        MirrorSettings.autoLandscape = prefs.getBoolean(KEY_LANDSCAPE, false)
         MirrorSettings.menuLayout = MenuLayout.fromKey(prefs.getString(KEY_LAYOUT, null))
         MirrorSettings.preferSoftwareDecoder = prefs.getBoolean(KEY_SW_DECODER, false)
         MirrorSettings.maxFps = prefs.getInt(KEY_MAX_FPS, 30)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">OgAuto V2 ALL</string>
+  <string name="app_name">OgAuto V3</string>
   <string name="notification_channel">Mirroring active</string>
   <string name="notification_mirroring">Screen sharing in progress</string>
   <string name="notification_stop">Stop</string>
@@ -149,4 +149,24 @@
   <string name="accessibility_enabled_not_bound">Accessibility permission is on but the touch service is not connected. Check Xiaomi autostart and battery settings.</string>
   <string name="apps_loading">Preparing apps…</string>
   <string name="favorites_edit">★ Edit favorites</string>
+    <string name="v3_picker_title">OgAuto V3 — Choose phone apps</string>
+    <string name="v3_picker_button">Select / manage installed phone apps</string>
+    <string name="v3_picker_explain">Choose launchable phone apps to show in the car app grid. Other apps cannot expose their private interactive screens without optional screen capture; media commands work only if supported.</string>
+    <string name="v3_picker_search">Search app name or package</string>
+    <string name="v3_picker_loading">Scanning installed apps…</string>
+    <string name="v3_picker_count">Selected: %1$d / available: %2$d</string>
+    <string name="v3_picker_clear">Clear selection</string>
+    <string name="v3_picker_done">Save and close</string>
+    <string name="v3_menu_split">Split — Browser / YouTube / IPTV</string>
+    <string name="v3_menu_split_short">Split view</string>
+    <string name="v3_show_all">All apps</string>
+    <string name="v3_selected_only">Selected only</string>
+    <string name="v3_app_open">Open on phone</string>
+    <string name="v3_app_play">Play / pause</string>
+    <string name="v3_app_previous">Previous media / channel</string>
+    <string name="v3_app_next">Next media / channel</string>
+    <string name="v3_app_back">Phone back</string>
+    <string name="v3_app_legacy_capture">Optional legacy screen capture</string>
+    <string name="v3_app_exit">Return to OgAuto home</string>
+    <string name="v3_app_launched">Launched on phone</string>
 </resources>

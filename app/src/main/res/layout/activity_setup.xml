@@ -20,6 +20,26 @@
         android:layout_marginTop="16dp"
         android:textSize="17sp"
         android:textStyle="bold"
+        android:text="@string/v3_picker_title" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:text="@string/v3_picker_explain" />
+
+    <Button
+        android:id="@+id/btn_v3_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/v3_picker_button" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="17sp"
+        android:textStyle="bold"
         android:text="@string/steps_title" />
 
     <LinearLayout

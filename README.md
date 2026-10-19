@@ -1,3 +1,21 @@
+# OgAuto V3 — Deneysel optimize sürüm
+
+Bu dal V2 ALL temelli, ana OgAuto ve V2 APK'larından tamamen ayrılmış bir denemedir.
+
+**Sürüm:** 3.0.0-beta1, debug uygulama paketi `com.onurguner.ogauto.v3`. `main` ve `experiment/v2-all` değişmez.
+
+**Özellikler:** Telefondan açılabilir uygulamaları seçme (OgAuto telefon arayüzünden), seçilenleri Android Auto uygulama ızgarasında görüntüleme, VYPN ve diğer uygulamalar için ortak media/başlatma kontrol menüsü, geri/çıkış kontrolleri, OgAuto içinde yatay veya dikey iki bağımsız web paneli; sağ panel YouTube TV'den OgAuto'nun seçili IPTV kanalına geçebilir. Dokunmatik yönlendirme, kaydırma, panelleri değiştir, yatay/dikey yerleşim ve tek tuşla çıkış eklenmiştir.
+
+**Teknik sınır:** Normal Android izinleriyle diğer üreticilerin uygulamalarının canlı, özel ekranlarını OgAuto'nun içine yansıtma olmadan yerleştirmek desteklenmez. Uygulama açma ve medya komutları çalışabilir; harici uygulamaların videoları yalnızca onlar OgAuto'ya bir yayın URL'si verdiyse kendi Video/IPTV oynatıcısına aktarılabilir. Bu gerçek, kullanıcıya uygulama seçicisinde açıklanır. Gerekirse mevcut manuel yansıtma seçeneği korunmuştur; uygulama açmak bunu otomatik başlatmaz.
+
+**İki panel:** Sol web tarayıcısı, sağ YouTube TV; daha önce OgAuto Video bölümünden kanal seçildiyse film simgesiyle sağ panel doğrudan IPTV oynatıcıya dönüşebilir. Çizim tek Android Auto yüzeyinde yapılır; bu Android Auto'nun Google Maps Coolwalk sağ paneli değildir. Ayrıca telefonun yatay kilidi V3 için varsayılan olarak kapalıdır (eski ayarlar farklıysa kullanıcı tercihi korunur).
+
+**Test:** Telefonu araçtan ayır → V3 APK'sını kur → telefonda V3'ün Uygulamaları seç menüsünden 3-5 uygulama seç → Android Auto'da V3 Uygulamalar'da yalnızca bu uygulamaları gör → VYPN'yi aç, medya düğmelerini dene → Çift paneli aç, panel değiştir, dikey/yatay böl, her iki panelde dokunma ve kaydırmayı dene → Video bölümünde M3U kanal seç → Çift panelde IPTV düğmesini dene → çıkış yap → geri görüş kamerasından dönüşü dene.
+
+**Kritik:** Bu özellikler gerçek araç üzerinde test edilmeden üretim kararlılığı iddia edilmez. Sürüşte video veya etkileşimli ekran kullanma.
+
+---
+
 # OgAuto V2 — Birleşik Deney Sürümü
 
 **Bu dal yalnızca test içindir.** [Normal OgAuto 0.8.2](https://github.com/OnurGuner5728/og-auto/tree/main) değişmemiştir.

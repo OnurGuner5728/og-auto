@@ -65,6 +65,9 @@ class SetupActivity : ComponentActivity() {
         SettingsStore.load(this)
 
         findViewById<Button>(R.id.btn_capture).setOnClickListener { requestCapture() }
+        findViewById<Button>(R.id.btn_v3_picker).setOnClickListener {
+            startActivity(Intent(this, V3AppPickerActivity::class.java))
+        }
         steps = SetupSteps(this, findViewById(R.id.steps_container))
         findViewById<Button>(R.id.btn_diag).setOnClickListener { shareDiagnostics() }
         findViewById<Button>(R.id.btn_patreon).setOnClickListener {

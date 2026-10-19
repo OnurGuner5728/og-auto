@@ -26,6 +26,7 @@ import com.onurguner.ogauto.R
 import com.onurguner.ogauto.car.FavoritesStore
 import com.onurguner.ogauto.core.CarLaunchPolicy
 import com.onurguner.ogauto.core.MirrorGateway
+import com.onurguner.ogauto.core.V3SelectedApps
 
 /**
  * Screen2Auto-style launcher: the phone's apps as a grid on the car
@@ -35,6 +36,7 @@ import com.onurguner.ogauto.core.MirrorGateway
 class AppsScreen(
     carContext: CarContext,
     private val page: Int = 0,
+    private val showAll: Boolean = false,
 ) : Screen(carContext) {
 
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
@@ -45,12 +47,13 @@ class AppsScreen(
         // Stable sorting keeps recently opened apps above alphabetical peers,
         // but all explicitly selected favorites still come first.
         val recentlyOrdered = RecentApps.order(carContext, loadApps()) { it.pkg }
-        val apps = recentlyOrdered.sortedWith(compareBy<AppEntry> { if (it.pkg in favorites) 0 else 1 })
+        val ranked = recentlyOrdered.sortedWith(compareBy<AppEntry> { if (it.pkg in favorites) 0 else 1 })
+        val apps = if (showAll) ranked else V3SelectedApps.filter(carContext, ranked) { it.pkg }
         val limit = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_GRID)
         }.getOrDefault(12).coerceAtLeast(4)
-        val perPage = (limit - 4).coerceAtLeast(1)
+        val perPage = (limit - 5).coerceAtLeast(1)
         val start = page * perPage
         val items = ItemList.Builder()
         if (page > 0) {
@@ -61,6 +64,9 @@ class AppsScreen(
             })
         }
         if (page == 0) {
+            items.addItem(navItem(if (showAll) R.string.v3_selected_only else R.string.v3_show_all, R.drawable.ic_grid) {
+                screenManager.push(AppsScreen(carContext, 0, !showAll))
+            })
             items.addItem(navItem(R.string.favorites_edit, R.drawable.ic_grid) {
                 choosingFavorites = !choosingFavorites
                 invalidate()
@@ -85,7 +91,7 @@ class AppsScreen(
         }
         if (start + perPage < apps.size) {
             items.addItem(navItem(R.string.video_next_page, R.drawable.ic_skip_next) {
-                screenManager.push(AppsScreen(carContext, page + 1))
+                screenManager.push(AppsScreen(carContext, page + 1, showAll))
             })
         }
         return GridTemplate.Builder()
@@ -110,12 +116,13 @@ class AppsScreen(
             CarToast.makeText(carContext, carContext.getString(R.string.apps_launch_failed), CarToast.LENGTH_LONG).show()
             return
         }
-        // Never start a capture merely because the user launched a phone app.
+        // Never start capture merely because a phone app was launched.
+        // Already approved projection can continue to be reused.
         if (CarLaunchPolicy.returnToExistingMirror(MirrorGateway.state.value.projection)) {
             screenManager.popTo(MIRROR_MARKER)
             if (screenManager.top !is MirrorScreen) screenManager.push(MirrorScreen(carContext))
         } else {
-            CarToast.makeText(carContext, carContext.getString(R.string.apps_started_on_phone), CarToast.LENGTH_LONG).show()
+            screenManager.push(V3AppControlScreen(carContext, app.pkg, app.label))
         }
     }
 

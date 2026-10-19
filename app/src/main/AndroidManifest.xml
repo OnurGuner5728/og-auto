@@ -80,6 +80,11 @@
         </provider>
 
         <activity
+            android:name=".setup.V3AppPickerActivity"
+            android:exported="false"
+            android:label="@string/v3_picker_title" />
+
+        <activity
             android:name=".setup.BookmarksActivity"
             android:exported="false"
             android:label="@string/bookmarks_title" />

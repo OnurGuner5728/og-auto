@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">OgAuto V2 ALL</string>
+  <string name="app_name">OgAuto V3</string>
   <string name="notification_channel">Yansıtma etkin</string>
   <string name="notification_mirroring">Telefon ekranı paylaşılıyor</string>
   <string name="notification_stop">Durdur</string>
@@ -149,4 +149,24 @@
   <string name="accessibility_enabled_not_bound">Erişilebilirlik izni açık ama dokunmatik servisi bağlı değil. Xiaomi otomatik başlatma ve pil ayarlarını kontrol et.</string>
   <string name="apps_loading">Uygulamalar hazırlanıyor…</string>
   <string name="favorites_edit">★ Favorileri düzenle</string>
+    <string name="v3_picker_title">OgAuto V3 — Uygulamalarını seç</string>
+    <string name="v3_picker_button">Telefondaki uygulamaları seç / düzenle</string>
+    <string name="v3_picker_explain">Telefonda yüklü, açılabilir uygulamaları buradan seç. Seçtiklerin araçtaki Uygulamalar menüsünde görünür. Üçüncü taraf uygulamaların kendi ekranı yansıtmasız içeri alınamaz; medya tuşları destekleniyorsa çalışır.</string>
+    <string name="v3_picker_search">Uygulama adı veya paket ara</string>
+    <string name="v3_picker_loading">Yüklü uygulamalar okunuyor…</string>
+    <string name="v3_picker_count">Seçili: %1$d / bulunabilen: %2$d</string>
+    <string name="v3_picker_clear">Seçimi temizle</string>
+    <string name="v3_picker_done">Kaydet ve çık</string>
+    <string name="v3_menu_split">Çift panel — Web / YouTube / IPTV</string>
+    <string name="v3_menu_split_short">Çift panel</string>
+    <string name="v3_show_all">Tüm uygulamalar</string>
+    <string name="v3_selected_only">Seçilenler</string>
+    <string name="v3_app_open">Telefonda yeniden aç</string>
+    <string name="v3_app_play">Oynat / duraklat</string>
+    <string name="v3_app_previous">Önceki medya / kanal</string>
+    <string name="v3_app_next">Sonraki medya / kanal</string>
+    <string name="v3_app_back">Telefon geri</string>
+    <string name="v3_app_legacy_capture">Eski yansıtmayı isteğe bağlı aç</string>
+    <string name="v3_app_exit">OgAuto ana menüsüne dön</string>
+    <string name="v3_app_launched">Uygulama telefonda açıldı</string>
 </resources>

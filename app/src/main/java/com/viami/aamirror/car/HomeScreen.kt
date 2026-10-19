@@ -37,8 +37,8 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         Mode(R.string.menu_apps, R.string.menu_apps_short, R.drawable.ic_grid) {
             screenManager.push(AppsScreen(carContext))
         },
-        Mode(R.string.menu_mirror, R.string.menu_mirror_short, R.drawable.ic_app) {
-            screenManager.push(MirrorScreen(carContext))
+        Mode(R.string.v3_menu_split, R.string.v3_menu_split_short, R.drawable.ic_grid) {
+            screenManager.push(V3SplitScreen(carContext))
         },
         Mode(R.string.menu_video, R.string.menu_video_short, R.drawable.ic_movie) {
             screenManager.push(VideoScreen(carContext))
@@ -51,6 +51,9 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         },
         Mode(R.string.menu_vypn, R.string.menu_vypn_short, R.drawable.ic_movie) {
             openVypn()
+        },
+        Mode(R.string.menu_mirror, R.string.menu_mirror_short, R.drawable.ic_app) {
+            screenManager.push(MirrorScreen(carContext))
         },
     )
 
@@ -154,7 +157,11 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             return
         }
         // The user may start capture explicitly after launching VYPN.
-        screenManager.push(MirrorScreen(carContext, mediaControls = true))
+        screenManager.push(V3AppControlScreen(
+            carContext,
+            intent.component?.packageName ?: VYPN_PACKAGES.first(),
+            "VYPN",
+        ))
     }
 
     private fun icon(iconRes: Int): CarIcon =

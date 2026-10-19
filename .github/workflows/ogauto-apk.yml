@@ -2,7 +2,7 @@ name: OgAuto APK
 
 on:
   push:
-    branches: [main, 'experiment/v2-*']
+    branches: [main, 'experiment/v2-*', 'experiment/v3-*']
     paths-ignore: ['downloads/**', 'docs/**', '*.md']
   pull_request:
     branches: [main]

@@ -51,6 +51,7 @@ class MirrorSession : Session(), DefaultLifecycleObserver {
             "browser" -> BrowserScreen(carContext)
             "youtube" -> YouTubeScreen(carContext)
             "mirror" -> MirrorScreen(carContext)
+            "split" -> V3SplitScreen(carContext)
             else -> return
         }
         manager.push(screen)

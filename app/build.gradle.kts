@@ -20,8 +20,8 @@ android {
         applicationId = "com.onurguner.ogauto"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.8.2-v2-all"
+        versionCode = 30
+        versionName = "3.0.0-beta1"
     }
 
     signingConfigs {
@@ -45,7 +45,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".v2.all"
+            applicationIdSuffix = ".v3"
         }
         release {
             isMinifyEnabled = false
