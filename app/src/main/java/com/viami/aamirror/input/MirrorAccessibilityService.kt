@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import android.graphics.Path
@@ -106,18 +107,53 @@ class MirrorAccessibilityService : AccessibilityService() {
             durationMs,
         )
 
+        private val gestureHandler = Handler(Looper.getMainLooper())
+        private var activeGesture = false
+        private var pendingGesture: GestureDescription? = null
+        private var serial = 0L
+
+        /**
+         * Coalesce bursty car scroll gestures. Android cancels earlier gestures
+         * if another one is submitted mid-flight. Keep at most one pending.
+         */
         private fun send(service: MirrorAccessibilityService, gesture: GestureDescription): Boolean {
             if (!enabledBySystem(service)) return false
-            return try {
-                service.dispatchGesture(gesture, object : GestureResultCallback() {
-                    override fun onCancelled(gestureDescription: GestureDescription?) {
-                        Log.w("OgAutoTouch", "gesture cancelled")
-                    }
-                }, Handler(Looper.getMainLooper()))
-            } catch (e: RuntimeException) {
-                Log.w("OgAutoTouch", "gesture dispatch failed", e)
-                false
+            gestureHandler.post {
+                if (instance !== service) return@post
+                if (activeGesture) {
+                    pendingGesture = gesture
+                } else {
+                    submitGesture(service, gesture)
+                }
             }
+            return true
+        }
+
+        private fun submitGesture(service: MirrorAccessibilityService, gesture: GestureDescription) {
+            if (instance !== service) return
+            activeGesture = true
+            val ticket = ++serial
+            val finish = {
+                if (ticket == serial) {
+                    activeGesture = false
+                    val next = pendingGesture
+                    pendingGesture = null
+                    if (next != null && instance === service) submitGesture(service, next)
+                }
+            }
+            val callback = object : GestureResultCallback() {
+                override fun onCompleted(gestureDescription: GestureDescription?) { finish() }
+                override fun onCancelled(gestureDescription: GestureDescription?) {
+                    Log.d("OgAutoTouch", "coalesced gesture cancelled")
+                    finish()
+                }
+            }
+            val ok = runCatching {
+                service.dispatchGesture(gesture, callback, gestureHandler)
+            }.getOrElse { Log.w("OgAutoTouch", "gesture dispatch failed", it); false }
+            if (!ok) finish()
+            // Failsafe if a vendor forgets to deliver the callback.
+            gestureHandler.postDelayed({ if (ticket == serial) finish() }, 600L)
         }
 
         private fun dispatch(path: Path, durationMs: Long): Boolean {
