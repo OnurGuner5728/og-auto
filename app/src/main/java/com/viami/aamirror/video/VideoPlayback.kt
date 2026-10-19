@@ -63,6 +63,7 @@ object VideoPlayback {
     private var appContext: Context? = null
     private var player: ExoPlayer? = null
     private var playerUsesSoftware = false
+    private var autoFallbackSoftware = false
 
     private var virtualDisplay: VirtualDisplay? = null
     private var presentation: Presentation? = null
@@ -150,6 +151,7 @@ object VideoPlayback {
         detachNow()
         player?.release()
         player = null
+        autoFallbackSoftware = false
         _status.value = null
     }
 
@@ -203,7 +205,7 @@ object VideoPlayback {
 
     private fun buildPlayer(): ExoPlayer {
         val context = appContext ?: error("init() not called")
-        val software = MirrorSettings.preferSoftwareDecoder
+        val software = MirrorSettings.preferSoftwareDecoder || autoFallbackSoftware
         // Software first: the phone's hardware codecs are shared with the
         // Android Auto video encoder; on some chipsets a hardware decode
         // starves that encoder and the whole car display freezes.
@@ -246,6 +248,16 @@ object VideoPlayback {
         override fun onPlayerError(error: PlaybackException) {
             Log.w(TAG, "playback error ${error.errorCodeName}", error)
             val p = player ?: return
+            if (error.errorCode in 4000..4999 && !playerUsesSoftware && !autoFallbackSoftware) {
+                autoFallbackSoftware = true
+                val i = _index.value
+                surfaceView?.let { p.clearVideoSurfaceView(it) }
+                p.release()
+                player = null
+                surfaceView?.let { buildPlayer().setVideoSurfaceView(it) } ?: buildPlayer()
+                if (i >= 0) playIndexNow(i)
+                return
+            }
             if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
                 p.seekToDefaultPosition()
                 p.prepare()
