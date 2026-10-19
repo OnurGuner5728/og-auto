@@ -1,23 +1,3 @@
-# OgAuto V2 — Birleşik Deney Sürümü
-
-**Bu dal yalnızca test içindir.** [Normal OgAuto 0.8.2](https://github.com/OnurGuner5728/og-auto/tree/main) değişmemiştir.
-
-**APK:** [OgAuto-0.8.2-v2-all-debug.apk](https://github.com/OnurGuner5728/og-auto/raw/experiment/v2-all/downloads/OgAuto-0.8.2-v2-all-debug.apk)
-
-Bu APK 11 ayrı V2 deneyini birleştirir: arka planda uygulama simgesi hazırlama, dokunmatik jest birleştirme, GPU çizim bütçesi, mod/surface geçişi, video çözücü hata durumunda yazılıma geçiş, simge belleği azaltma, yeniden bağlanma, son uygulamalar/kanal, kamera sonrası son ekran geri yükleme, favoriler ve performans kayıtları.
-
-**Ayrı kurulur:** Paket adı `com.onurguner.ogauto.v2.all`. Orijinal OgAuto'yu kaldırmak gerekmez. Ancak erişilebilirlik ve Android Auto kurulum izinleri V2 için ayrı verilebilir. Aynı anda iki OgAuto varyantının servisini etkinleştirmeyin.
-
-**Kamera test sınırı:** Son ekranın geri yüklenmesi, aracın Android Auto oturumunu yeniden oluşturmasına bağlıdır; Android Auto tamamen sonlandırılırsa veya sistem yeniden ekran paylaşım izni isterse V2 bunu gizlice açamaz. Kamera sırasında Android Auto yüzeyinin kaybolması halinde yüzey dönüşünde yeniden bağlanma denenir.
-
-**Performans kaydı:** `adb logcat -s OgAutoPerf OgAutoSurface OgAutoTouch MirrorRenderer` ile incelenebilir.
-
-**Test sırası:** V2 Uygulamalar menüsü → favoriler ve son kullanılanlar → dokunmatik → YouTube/Tarayıcı/Video geçişleri → IPTV kanal değişimi → ekran paylaşımı (manuel) → geri görüş kamerası → kabloyu çıkar-tak. Her adımda 0.8.2 ile aynı senaryoyu karşılaştırın.
-
-**Bu dalı ana dala birleştirmeyin; araç testlerinden sonra karar verin.**
-
----
-
 <div align="center">
 
 # OgAuto
@@ -171,6 +151,8 @@ IPTV uygulamasının ayarlarında **Harici oynatıcı → OgAuto (araçta oynat)
 Ekran kareleri uygulama tarafından kaydedilmez veya geliştiriciye gönderilmez. Web siteleri, yayın sunucuları ve diğer uygulamaların kendi ağ trafiği devam eder. Bu uygulama Google tarafından onaylı değildir; Android Auto’da görünmesi telefona, araca ve Android Auto sürümüne bağlıdır.
 
 ## Sürümler
+
+- **0.8.3** — Daha önce `experiment/v2-all` dalında araçta test edilen V2 optimizasyonları ana sürüme taşındı: uygulama simgelerini arka planda hazırlama, dokunmatik hareketleri sıraya alma, GPU kare bütçesi, görünüm geçişleri ve yeniden bağlanma, IPTV çözücü kurtarma, favoriler, son uygulamalar, kamera sonrası ekran geri yükleme denemesi ve performans kayıtları. Android Auto / araç davranışı cihazdan cihaza değişebilir; tüm V2 deneyleri her araçta kesin çalışır anlamına gelmez. V3'ün uygulama gömme ve iki panel denemeleri bu sürüme dahil **değildir**.
 
 - **0.8.2** — Uygulamalar varsayılan olarak ilk sırada. Uygulama açmak veya Android Auto'nun yeniden bağlanması yansıtmayı başlatmaz; paylaşım araçtan manuel başlatılır. Erişilebilirlik izni açık olsa bile servis bağlantısının kopması ayrı gösterilir, Xiaomi otomatik başlatma ayarları için kısayol eklendi. VYPN'de medya geri/ileri düğmeleri sunulur (VYPN destekliyorsa çalışır).
 
