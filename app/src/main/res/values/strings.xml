@@ -151,7 +151,7 @@
   <string name="favorites_edit">★ Favorileri düzenle</string>
     <string name="v3_picker_title">OgAuto V3 — Uygulamalarını seç</string>
     <string name="v3_picker_button">Telefondaki uygulamaları seç / düzenle</string>
-    <string name="v3_picker_explain">Telefonda yüklü, açılabilir uygulamaları buradan seç. Seçtiklerin araçtaki Uygulamalar menüsünde görünür. Üçüncü taraf uygulamaların kendi ekranı yansıtmasız içeri alınamaz; medya tuşları destekleniyorsa çalışır.</string>
+    <string name="v3_picker_explain">Telefonda yüklü, açılabilir uygulamaları buradan seç. Yalnızca seçtiklerin araçtaki Uygulamalar menüsünde görünür. Telefon ekranı otomatik yansıtılmaz. Üçüncü taraf uygulamaların tamamı gömülü çalışamaz; ikinci ekranda açma deneyseldir ve medya tuşları uygulama destekliyorsa çalışır.</string>
     <string name="v3_picker_search">Uygulama adı veya paket ara</string>
     <string name="v3_picker_loading">Yüklü uygulamalar okunuyor…</string>
     <string name="v3_picker_count">Seçili: %1$d / bulunabilen: %2$d</string>
@@ -173,4 +173,6 @@
     <string name="v3_external_not_supported">Bu telefonda ikinci ekran uygulama başlatma veya dokunmatik API desteği bulunmuyor.</string>
     <string name="v3_external_testing">Deneysel ikinci ekran başlatıldı. Görüntü yoksa uygulama/telefon engelliyor olabilir.</string>
     <string name="v3_external_failed">Bu uygulama ikinci ekranda başlatılamadı. Telefonda açma veya manuel yansıtmayı kullan.</string>
+    <string name="v3_picker_empty">Henüz uygulama seçilmedi — telefondan OgAuto uygulamasını aç</string>
+    <string name="v3_picker_phone_help">Telefonda OgAuto → Uygulamalarını seç. Ardından araç menüsünü yeniden aç.</string>
 </resources>

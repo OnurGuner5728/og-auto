@@ -151,7 +151,7 @@
   <string name="favorites_edit">★ Edit favorites</string>
     <string name="v3_picker_title">OgAuto V3 — Choose phone apps</string>
     <string name="v3_picker_button">Select / manage installed phone apps</string>
-    <string name="v3_picker_explain">Choose launchable phone apps to show in the car app grid. Other apps cannot expose their private interactive screens without optional screen capture; media commands work only if supported.</string>
+    <string name="v3_picker_explain">Only selected phone apps appear in the car launcher. Phone screen capture does not start automatically. Universal app embedding is not supported; secondary-display launching is experimental, and media keys require app support.</string>
     <string name="v3_picker_search">Search app name or package</string>
     <string name="v3_picker_loading">Scanning installed apps…</string>
     <string name="v3_picker_count">Selected: %1$d / available: %2$d</string>
@@ -173,4 +173,6 @@
     <string name="v3_external_not_supported">Secondary display activities or touch APIs are unsupported on this phone.</string>
     <string name="v3_external_testing">Experimental secondary display requested. A black screen may mean the app or phone blocked launch.</string>
     <string name="v3_external_failed">Cannot launch this app on the secondary display. Open on phone or use optional mirroring.</string>
+    <string name="v3_picker_empty">No selected apps — open OgAuto on your phone</string>
+    <string name="v3_picker_phone_help">On phone: OgAuto → Select apps; then reopen the car apps menu.</string>
 </resources>

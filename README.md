@@ -1,3 +1,11 @@
+> **V3 TEST (3.0.0-beta2)** — Bu deneysel dal `experiment/v3-test-ready` olarak ayrıdır. `main` ve `experiment/v2-all` değiştirilmez. APK adı `OgAuto-3.0.0-beta2-debug.apk` olacaktır; önceden derlenmiş eski `OgAuto-latest.apk` dosyasını V3 sanmayın.
+>
+> **V3 çalışma prensibi:** Telefonda OgAuto → “Uygulamalarını seç” ile açıkça seçtiğiniz uygulamalar araçtaki listede görünür. Boş seçim hiçbir uygulamayı göstermez. Bir uygulamaya dokunmak telefon ekranını yakalamaz ve telefon uygulamasını otomatik açmaz. Araç içi ikinci-ekran başlatma seçeneği cihaz/uygulama izinlerine bağlı deneysel bir özelliktir. İki panel modu yalnızca OgAuto'nun kendi WebView/YouTube TV/IPTV içeriği içindir; Google Haritalar dahil herhangi iki *yerel Android uygulamasını* bağımsız biçimde gömmeyi garanti etmez. Kullanıcı seçimiyle çalışan iki WebView birer gerçek Android uygulama süreci değildir.
+>
+> **Kaynak kullanımı:** Ekran paylaşımı otomatik açılmaz; uygulama simgeleri sadece seçilenler için yüklenir; çift panel yalnızca açıkken WebView/oynatıcı kaynaklarını kullanır ve kapanışta serbest bırakır. Yine de araçta gerçek performans ve dokunmatik kontrol kullanıcı testi gerektirir.
+>
+> **Kurulum:** V3 debug `applicationId` eki `.v3` sayesinde normal OgAuto'nun yanına kurulur. Aynı anda iki OgAuto Android Auto servisi görünürse testte V3'ü seçin. Kurmadan önce APK'nın gerçekten V3 beta2 olduğunu doğrulayın.
+
 # OgAuto V3 — Deneysel optimize sürüm
 
 Bu dal V2 ALL temelli, ana OgAuto ve V2 APK'larından tamamen ayrılmış bir denemedir.

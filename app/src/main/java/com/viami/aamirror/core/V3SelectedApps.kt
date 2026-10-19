@@ -15,9 +15,9 @@ object V3SelectedApps {
             .putStringSet(KEY, packages.toSet()).apply()
     }
 
-    /** Initial install shows all launchable apps until a user makes selections. */
+    /** V3 is opt-in: an empty selection must never expose every phone app. */
     fun <T> filter(context: Context, items: List<T>, packageName: (T) -> String): List<T> {
         val selected = get(context)
-        return if (selected.isEmpty()) items else items.filter { packageName(it) in selected }
+        return items.filter { packageName(it) in selected }
     }
 }

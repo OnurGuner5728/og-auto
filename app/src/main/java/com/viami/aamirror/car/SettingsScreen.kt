@@ -27,9 +27,6 @@ class SettingsScreen(carContext: CarContext) : Screen(carContext) {
     override fun onGetTemplate(): Template {
         val list = ItemList.Builder()
             .addItem(layoutRow())
-            .addItem(rotationRow())
-            .addItem(fillRow())
-            .addItem(fpsRow())
             .addItem(decoderRow())
             .build()
         return ListTemplate.Builder()

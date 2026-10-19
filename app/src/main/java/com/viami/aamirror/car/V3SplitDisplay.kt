@@ -42,14 +42,14 @@ internal object V3SplitDisplay {
     private var display: VirtualDisplay? = null
     private var presentation: Presentation? = null
     private var root: LinearLayout? = null
-    private data class Pane(val frame: FrameLayout, val web: WebView?, val video: SurfaceView?)
+    private data class Pane(val frame: FrameLayout, val web: WebView?, val video: SurfaceView?, val role: Int)
     private val panes = mutableListOf<Pane>()
     private var player: ExoPlayer? = null
     private var horizontal = true
     private var selected = 0
     private var screenWidth = 1
     private var screenHeight = 1
-    private var browserUrl = "https://www.google.com"
+    private var browserUrl = "https://www.google.com/maps"
     private var youtubeUrl = "https://www.youtube.com/tv"
     private var showVideo = false
     private var videoIndex = -1
@@ -69,7 +69,8 @@ internal object V3SplitDisplay {
             display = vd
             val show = Presentation(context, vd.display)
             presentation = show
-            root = LinearLayout(show.context).apply { setBackgroundColor(Color.BLACK) }
+            val layout = LinearLayout(show.context).apply { setBackgroundColor(Color.BLACK) }
+            root = layout
             val first = makeWeb(show.context, browserUrl, 0)
             val second = if (showVideo && VideoPlayback.current != null) {
                 makeVideo(show.context)
@@ -80,7 +81,7 @@ internal object V3SplitDisplay {
             panes.add(first)
             panes.add(second)
             rebuild()
-            show.setContentView(root)
+            show.setContentView(layout)
             show.show()
         } catch (e: Exception) {
             Log.e(TAG, "cannot build split screen", e)
@@ -94,7 +95,7 @@ internal object V3SplitDisplay {
         web.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            mediaPlaybackRequiresUserGesture = false
+            mediaPlaybackRequiresUserGesture = true
             useWideViewPort = true
             loadWithOverviewMode = true
         }
@@ -105,7 +106,7 @@ internal object V3SplitDisplay {
         }
         frame.addView(web, FrameLayout.LayoutParams(-1, -1))
         web.loadUrl(url)
-        return Pane(frame, web, null)
+        return Pane(frame, web, null, index)
     }
 
     private fun makeVideo(context: Context): Pane {
@@ -113,7 +114,7 @@ internal object V3SplitDisplay {
         val view = SurfaceView(context)
         frame.addView(view, FrameLayout.LayoutParams(-1, -1))
         frame.setBackgroundColor(Color.BLACK)
-        return Pane(frame, null, view)
+        return Pane(frame, null, view, 1)
     }
 
     private fun rebuild() {
@@ -158,7 +159,8 @@ internal object V3SplitDisplay {
         }
         showVideo = !showVideo
         val layout = root ?: return@onMain
-        val targetIndex = if (!showVideo) panes.indexOfFirst { it.video != null }.coerceAtLeast(0) else 1
+        val targetIndex = panes.indexOfFirst { it.role == 1 }
+        if (targetIndex < 0) return@onMain
         val previous = panes.removeAt(targetIndex)
         layout.removeAllViews()
         previous.web?.let { web ->
@@ -271,12 +273,16 @@ internal object V3SplitDisplay {
     fun reload() = onMain { panes.getOrNull(selected)?.web?.reload() }
 
     private fun locate(x: Float, y: Float): Triple<Int, Float, Float> {
-        if (panes.size < 2) return Triple(0, x, y)
-        val half = if (horizontal) screenWidth / 2f else screenHeight / 2f
-        val which = if ((if (horizontal) x else y) < half) 0 else 1
-        val localX = if (horizontal && which == 1) x - half else x
-        val localY = if (!horizontal && which == 1) y - half else y
-        return Triple(which, localX, localY)
+        // The divider and panel swaps change actual boundaries: never assume 50%.
+        panes.forEachIndexed { index, pane ->
+            val frame = pane.frame
+            if (x >= frame.left && x < frame.right && y >= frame.top && y < frame.bottom) {
+                return Triple(index, x - frame.left, y - frame.top)
+            }
+        }
+        val index = selected.coerceIn(0, (panes.size - 1).coerceAtLeast(0))
+        val frame = panes.getOrNull(index)?.frame
+        return Triple(index, x - (frame?.left ?: 0), y - (frame?.top ?: 0))
     }
 
     private fun send(web: WebView, action: Int, x: Float, y: Float, down: Long) {

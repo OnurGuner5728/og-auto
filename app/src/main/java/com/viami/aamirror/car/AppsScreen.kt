@@ -36,7 +36,6 @@ import com.onurguner.ogauto.core.V3SelectedApps
 class AppsScreen(
     carContext: CarContext,
     private val page: Int = 0,
-    private val showAll: Boolean = false,
 ) : Screen(carContext) {
 
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
@@ -48,32 +47,29 @@ class AppsScreen(
         // but all explicitly selected favorites still come first.
         val recentlyOrdered = RecentApps.order(carContext, loadApps()) { it.pkg }
         val ranked = recentlyOrdered.sortedWith(compareBy<AppEntry> { if (it.pkg in favorites) 0 else 1 })
-        val apps = if (showAll) ranked else V3SelectedApps.filter(carContext, ranked) { it.pkg }
+        val apps = V3SelectedApps.filter(carContext, ranked) { it.pkg }
         val limit = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_GRID)
         }.getOrDefault(12).coerceAtLeast(4)
-        val perPage = (limit - 5).coerceAtLeast(1)
+        val perPage = (limit - 2).coerceAtLeast(1)
         val start = page * perPage
         val items = ItemList.Builder()
         if (page > 0) {
             items.addItem(navItem(R.string.video_prev_page, R.drawable.ic_skip_prev) { screenManager.pop() })
-        } else {
-            items.addItem(navItem(R.string.apps_manual_mirror, R.drawable.ic_cast) {
-                screenManager.push(MirrorScreen(carContext))
-            })
-        }
-        if (page == 0) {
-            items.addItem(navItem(if (showAll) R.string.v3_selected_only else R.string.v3_show_all, R.drawable.ic_grid) {
-                screenManager.push(AppsScreen(carContext, 0, !showAll))
-            })
+        } else if (apps.isNotEmpty()) {
             items.addItem(navItem(R.string.favorites_edit, R.drawable.ic_grid) {
                 choosingFavorites = !choosingFavorites
                 invalidate()
             })
         }
-        if (apps.isEmpty() && loading) {
-            items.addItem(navItem(R.string.apps_loading, R.drawable.ic_grid) { })
+        if (apps.isEmpty()) {
+            items.addItem(navItem(
+                if (loading) R.string.apps_loading else R.string.v3_picker_empty,
+                R.drawable.ic_grid,
+            ) {
+                CarToast.makeText(carContext, carContext.getString(R.string.v3_picker_phone_help), CarToast.LENGTH_LONG).show()
+            })
         }
         apps.drop(start).take(perPage).forEach { app ->
             items.addItem(
@@ -91,7 +87,7 @@ class AppsScreen(
         }
         if (start + perPage < apps.size) {
             items.addItem(navItem(R.string.video_next_page, R.drawable.ic_skip_next) {
-                screenManager.push(AppsScreen(carContext, page + 1, showAll))
+                screenManager.push(AppsScreen(carContext, page + 1))
             })
         }
         return GridTemplate.Builder()
@@ -103,55 +99,42 @@ class AppsScreen(
     }
 
     private fun launch(app: AppEntry) {
-        val intent = (carContext.packageManager.getLaunchIntentForPackage(app.pkg)
-            ?: carContext.packageManager.getLeanbackLaunchIntentForPackage(app.pkg))
-            ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-        try {
-            requireNotNull(intent)
-            // Allowed from the background: OgAuto holds an enabled
-            // accessibility service / overlay permission.
-            carContext.applicationContext.startActivity(intent)
-            RecentApps.record(carContext, app.pkg)
-        } catch (e: Exception) {
-            Log.w(TAG, "launch ${app.pkg} failed", e)
-            CarToast.makeText(carContext, carContext.getString(R.string.apps_launch_failed), CarToast.LENGTH_LONG).show()
-            return
-        }
-        // Never start capture merely because a phone app was launched.
-        // Already approved projection can continue to be reused.
-        if (CarLaunchPolicy.returnToExistingMirror(MirrorGateway.state.value.projection)) {
-            screenManager.popTo(MIRROR_MARKER)
-            if (screenManager.top !is MirrorScreen) screenManager.push(MirrorScreen(carContext))
-        } else {
-            screenManager.push(V3AppControlScreen(carContext, app.pkg, app.label))
-        }
+        // Opening the car launcher never starts a phone activity or captures its screen.
+        // The user chooses native media controls or an explicit secondary-display test.
+        RecentApps.record(carContext, app.pkg)
+        screenManager.push(V3AppControlScreen(carContext, app.pkg, app.label))
     }
 
     /** Never decode all launcher icons synchronously in onGetTemplate(). */
     private fun loadApps(): List<AppEntry> {
-        cache?.let { return it }
+        val selected = V3SelectedApps.get(carContext)
+        if (selected.isEmpty()) return emptyList()
+        val requestedKey = selected.sorted().joinToString("|")
+        if (cacheKey == requestedKey) cache?.let { return it }
         synchronized(AppsScreen::class.java) {
             if (loading) return emptyList()
             loading = true
         }
         val pm = carContext.packageManager
-        val myPackage = carContext.packageName
         executor.execute {
             val result = runCatching {
                 val queries = listOf(
                     Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
                     Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER),
                 )
-                queries.flatMap { pm.queryIntentActivities(it, PackageManager.MATCH_ALL) }
+                queries.flatMap { pm.queryIntentActivities(it, 0) }
                     .asSequence().map { it.activityInfo }
-                    .filter { it.packageName != myPackage }.distinctBy { it.packageName }
+                    // Decode icons only for apps explicitly chosen on the phone.
+                    .filter { it.packageName in selected }
+                    .distinctBy { it.packageName }
                     .map { info ->
                         AppEntry(info.loadLabel(pm).toString(), info.packageName,
                             CarIcon.Builder(IconCompat.createWithBitmap(toBitmap(info.loadIcon(pm)))).build())
-                    }
-                    .sortedBy { it.label.lowercase() }.toList()
-            }.onFailure { Log.w(TAG, "async app scan failed", it) }.getOrDefault(emptyList())
+                    }.sortedBy { it.label.lowercase() }.toList()
+            }.onFailure { Log.w(TAG, "async selected app scan failed", it) }
+                .getOrDefault(emptyList())
             cache = result
+            cacheKey = requestedKey
             loading = false
             Handler(Looper.getMainLooper()).post {
                 if (lifecycle.currentState != androidx.lifecycle.Lifecycle.State.DESTROYED) invalidate()
@@ -182,10 +165,11 @@ class AppsScreen(
 
         /** Icons are expensive to render; built once per process. */
         @Volatile private var cache: List<AppEntry>? = null
+        @Volatile private var cacheKey: String? = null
         @Volatile private var choosingFavorites: Boolean = false
 
         /** Discard icon bitmaps when the system reports memory pressure. */
-        fun clearCache() { cache = null }
+        fun clearCache() { cache = null; cacheKey = null }
         @Volatile private var loading: Boolean = false
         private val executor = Executors.newSingleThreadExecutor { task ->
             Thread(task, "ogauto-app-icons").apply { isDaemon = true }

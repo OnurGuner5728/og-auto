@@ -119,9 +119,6 @@ class V3ExternalAppScreen(
                 val current = SurfaceRouter.container
                 if (current != null) sink.onAttach(current)
             })
-            .addAction(action(R.drawable.ic_cast) {
-                screenManager.push(MirrorScreen(carContext, mediaControls = true))
-            })
             .build()
         return NavigationTemplate.Builder()
             .setActionStrip(strip)
