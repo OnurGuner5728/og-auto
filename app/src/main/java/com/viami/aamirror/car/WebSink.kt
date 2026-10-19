@@ -39,7 +39,10 @@ class WebSink private constructor(
         private const val TAG = "WebSink"
         private val cache = mutableMapOf<WebDisplay, WebSink>()
 
-        fun of(carContext: CarContext, display: WebDisplay): WebSink =
-            cache.getOrPut(display) { WebSink(carContext, display) }
+        fun of(carContext: CarContext, display: WebDisplay): WebSink {
+            val existing = cache[display]
+            if (existing != null && existing.carContext === carContext) return existing
+            return WebSink(carContext, display).also { cache[display] = it }
+        }
     }
 }

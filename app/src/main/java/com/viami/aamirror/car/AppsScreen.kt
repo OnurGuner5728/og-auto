@@ -115,7 +115,7 @@ class AppsScreen(
     }
 
     private fun toBitmap(d: Drawable): Bitmap {
-        val size = 96
+        val size = 72
         val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         d.setBounds(0, 0, size, size)
@@ -136,5 +136,8 @@ class AppsScreen(
 
         /** Icons are expensive to render; built once per process. */
         private var cache: List<AppEntry>? = null
+
+        /** Avoid retaining launcher bitmaps when Android signals memory pressure. */
+        fun clearCache() { cache = null }
     }
 }
