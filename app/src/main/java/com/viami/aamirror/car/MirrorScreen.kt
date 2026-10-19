@@ -27,7 +27,7 @@ import com.onurguner.ogauto.mirror.SurfaceTarget
 import com.onurguner.ogauto.setup.StartRequests
 import kotlinx.coroutines.launch
 
-class MirrorScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleObserver {
+class MirrorScreen(carContext: CarContext, private val mediaControls: Boolean = false) : Screen(carContext), DefaultLifecycleObserver {
 
     private val sink = object : SurfaceSink {
         override fun onAttach(container: SurfaceContainer) {
@@ -35,7 +35,7 @@ class MirrorScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycl
             MirrorGateway.attachSurface(
                 SurfaceTarget(surface, container.width, container.height, container.dpi)
             )
-            ensureProjection()
+            // Car reconnection must not request a capture permission.
             renderStatusIfIdle()
         }
 
@@ -69,40 +69,51 @@ class MirrorScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycl
 
     override fun onCreate(owner: LifecycleOwner) {
         lifecycleScope.launch {
-            MirrorGateway.state.collect { renderStatusIfIdle() }
+            MirrorGateway.state.collect { renderStatusIfIdle(); invalidate() }
         }
     }
 
     override fun onStart(owner: LifecycleOwner) {
         SurfaceRouter.setSink(sink)
+        if (MirrorGateway.state.value.projection == ProjectionStatus.NONE) {
+            CarToast.makeText(carContext, carContext.getString(R.string.car_capture_manual), CarToast.LENGTH_LONG).show()
+        }
     }
 
     override fun onGetTemplate(): Template {
         val strip = ActionStrip.Builder()
             .addAction(action(R.drawable.ic_menu) { screenManager.pop() })
-            .addAction(action(R.drawable.ic_play_pause) { PhoneKeys.playPause(carContext) })
-            .addAction(action(R.drawable.ic_back) {
+        if (mediaControls) {
+            strip.addAction(action(R.drawable.ic_skip_prev) { PhoneKeys.previous(carContext) })
+            strip.addAction(action(R.drawable.ic_play_pause) { PhoneKeys.playPause(carContext) })
+            strip.addAction(action(R.drawable.ic_skip_next) { PhoneKeys.next(carContext) })
+        } else {
+            strip.addAction(action(R.drawable.ic_play_pause) { PhoneKeys.playPause(carContext) })
+            strip.addAction(action(R.drawable.ic_back) {
                 requireAccessibility { MirrorAccessibilityService.pressBack() }
             })
-            .addAction(action(R.drawable.ic_home) {
+            strip.addAction(action(R.drawable.ic_home) {
                 requireAccessibility { MirrorAccessibilityService.pressHome() }
             })
-            .build()
+        }
         // ↻ re-binds the mirror to the car surface: the recovery for a
         // picture that stalled while the phone kept playing.
-        val reconnect = action(R.drawable.ic_reload) {
-            MirrorGateway.requestRefresh()
-            CarToast.makeText(
-                carContext,
-                carContext.getString(R.string.car_video_refreshed),
-                CarToast.LENGTH_SHORT,
-            ).show()
+        val projection = MirrorGateway.state.value.projection
+        val reconnect = action(if (projection == ProjectionStatus.ACTIVE) R.drawable.ic_reload else R.drawable.ic_cast) {
+            when (MirrorGateway.state.value.projection) {
+                ProjectionStatus.ACTIVE -> {
+                    MirrorGateway.requestRefresh()
+                    CarToast.makeText(carContext, carContext.getString(R.string.car_video_refreshed), CarToast.LENGTH_SHORT).show()
+                }
+                ProjectionStatus.NONE -> ensureProjection()
+                ProjectionStatus.REQUESTED -> CarToast.makeText(carContext, carContext.getString(R.string.car_confirm_on_phone), CarToast.LENGTH_LONG).show()
+            }
         }
         val apps = action(R.drawable.ic_grid) { screenManager.push(AppsScreen(carContext)) }
         val recents = action(R.drawable.ic_list) {
             requireAccessibility { MirrorAccessibilityService.pressRecents() }
         }
-        return NavigationTemplate.Builder().setActionStrip(strip)
+        return NavigationTemplate.Builder().setActionStrip(strip.build())
             .withPan(apps, recents, reconnect).build()
     }
 

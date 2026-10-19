@@ -42,7 +42,7 @@
   <string name="save">Save</string>
   <string name="delete">Delete</string>
   <string name="cancel">Cancel</string>
-  <string name="status_idle">Sharing stopped. Approve capture and open OgAuto in the car.</string>
+  <string name="status_idle">Mirroring is off. Tap the share icon and approve it on your phone.</string>
   <string name="status_waiting">Waiting for approval…</string>
   <string name="status_ready">Ready: open OgAuto in the car</string>
   <string name="status_mirroring">Mirroring to car display</string>
@@ -132,7 +132,7 @@
   <string name="btn_patreon">❤ Support · Patreon</string>
   <string name="btn_support">Support: onurguner.bjk@gmail.com</string>
   <string name="setup_footer">In the car: OgAuto → Mirror, Apps or Video. The driver must not use this while driving. DRM-protected services (Netflix etc.) do not show in the car.</string>
-  <string name="menu_vypn">VYPN (open on phone + mirror)</string>
+  <string name="menu_vypn">VYPN (optional mirroring)</string>
   <string name="menu_vypn_short">VYPN</string>
   <string name="vypn_missing">VYPN is not installed on the phone</string>
   <string name="menu_fps">Mirror frame rate</string>
@@ -141,4 +141,10 @@
   <string name="fps_row_60">Uncapped — smoothest, may freeze on some phones (next connection)</string>
   <string name="btn_diag">Share diagnostic log (after a freeze)</string>
   <string name="diag_empty">No log yet. Use mirroring in the car first.</string>
+  <string name="apps_manual_mirror">Start mirroring (optional)</string>
+  <string name="apps_started_on_phone">App launched on phone. Choose Start mirroring to see it in the car.</string>
+  <string name="car_capture_manual">Mirroring is off. Tap the screen-share icon, then approve it on your phone.</string>
+  <string name="step_autostart">Xiaomi autostart</string>
+  <string name="step_autostart_help">Xiaomi/POCO: Allow OgAuto in Security → Permissions → Autostart and set battery to Unrestricted. Android controls accessibility permission.</string>
+  <string name="accessibility_enabled_not_bound">Accessibility permission is on but the touch service is not connected. Check Xiaomi autostart and battery settings.</string>
 </resources>

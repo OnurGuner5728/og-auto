@@ -51,12 +51,20 @@ class SetupSteps(private val activity: Activity, private val container: LinearLa
             InstallerHelper.start(activity)
         },
         Step(R.string.step_restricted, R.string.step_restricted_help, R.string.step_restricted_btn,
-            { if (Build.VERSION.SDK_INT < 33 || accessibilityEnabled()) State.DONE else State.CHECK }) {
+            { if (Build.VERSION.SDK_INT < 33 || MirrorAccessibilityService.enabledBySystem(activity)) State.DONE else State.CHECK }) {
             open(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, pkgUri()))
             Toast.makeText(activity, R.string.step_restricted_toast, Toast.LENGTH_LONG).show()
         },
         Step(R.string.step_accessibility, R.string.step_accessibility_help, R.string.step_open,
-            { if (accessibilityEnabled()) State.DONE else State.TODO }) { openAccessibility() },
+            {
+                when {
+                    MirrorAccessibilityService.ready(activity) -> State.DONE
+                    MirrorAccessibilityService.enabledBySystem(activity) -> State.CHECK
+                    else -> State.TODO
+                }
+            }) { openAccessibility() },
+        Step(R.string.step_autostart, R.string.step_autostart_help, R.string.step_open,
+            { if (isXiaomiFamily()) State.CHECK else State.DONE }) { openAutoStartSettings() },
         Step(R.string.step_overlay, R.string.step_overlay_help, R.string.step_open,
             { if (Settings.canDrawOverlays(activity)) State.DONE else State.TODO }) {
             open(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, pkgUri()))
@@ -104,7 +112,9 @@ class SetupSteps(private val activity: Activity, private val container: LinearLa
                 setPadding(0, (16 * density).toInt(), 0, 0)
             }
             val help = TextView(activity).apply {
-                text = activity.getString(step.help)
+                text = if (step.title == R.string.step_accessibility && state == State.CHECK) {
+                    activity.getString(R.string.accessibility_enabled_not_bound)
+                } else activity.getString(step.help)
                 textSize = 13f
             }
             val button = Button(activity).apply {
@@ -152,15 +162,18 @@ class SetupSteps(private val activity: Activity, private val container: LinearLa
     private val serviceComponent: ComponentName
         get() = ComponentName(activity, MirrorAccessibilityService::class.java)
 
-    private fun accessibilityEnabled(): Boolean {
-        if (MirrorAccessibilityService.instance != null) return true
-        val enabled = Settings.Secure.getString(
-            activity.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-        ) ?: return false
-        val me = serviceComponent
-        return enabled.split(':').any {
-            ComponentName.unflattenFromString(it) == me
-        }
+    private fun isXiaomiFamily(): Boolean = Build.MANUFACTURER.lowercase() in
+        setOf("xiaomi", "redmi", "poco")
+
+    private fun openAutoStartSettings() {
+        // The user, not OgAuto, controls these MIUI/HyperOS settings.
+        openOrToast(
+            Intent().setClassName(
+                "com.miui.securitycenter",
+                "com.miui.permcenter.autostart.AutoStartManagementActivity",
+            ),
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, pkgUri()),
+        )
     }
 
     private fun openAccessibility() {

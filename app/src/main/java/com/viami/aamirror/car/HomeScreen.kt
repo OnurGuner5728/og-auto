@@ -34,11 +34,11 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
     )
 
     private val modes = listOf(
-        Mode(R.string.menu_mirror, R.string.menu_mirror_short, R.drawable.ic_app) {
-            screenManager.push(MirrorScreen(carContext))
-        },
         Mode(R.string.menu_apps, R.string.menu_apps_short, R.drawable.ic_grid) {
             screenManager.push(AppsScreen(carContext))
+        },
+        Mode(R.string.menu_mirror, R.string.menu_mirror_short, R.drawable.ic_app) {
+            screenManager.push(MirrorScreen(carContext))
         },
         Mode(R.string.menu_video, R.string.menu_video_short, R.drawable.ic_movie) {
             screenManager.push(VideoScreen(carContext))
@@ -151,7 +151,8 @@ class HomeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             ).show()
             return
         }
-        screenManager.push(MirrorScreen(carContext))
+        // The user may start capture explicitly after launching VYPN.
+        screenManager.push(MirrorScreen(carContext, mediaControls = true))
     }
 
     private fun icon(iconRes: Int): CarIcon =
