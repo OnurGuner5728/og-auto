@@ -32,8 +32,6 @@ class AppsScreen(
     private val page: Int = 0,
 ) : Screen(carContext) {
 
-    private var choosingFavorites = false
-
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
 
     override fun onGetTemplate(): Template {
@@ -148,6 +146,8 @@ class AppsScreen(
     companion object {
         private const val TAG = "AppsScreen"
         const val MIRROR_MARKER = "mirror"
+
+        @Volatile private var choosingFavorites = false
 
         /** Icons are expensive to render; built once per process. */
         private var cache: List<AppEntry>? = null
