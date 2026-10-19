@@ -11,7 +11,6 @@ import androidx.car.app.model.ListTemplate
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import com.onurguner.ogauto.R
-import com.onurguner.ogauto.input.MirrorAccessibilityService
 import com.onurguner.ogauto.input.PhoneKeys
 
 /**
@@ -35,11 +34,6 @@ class V3AppControlScreen(
         add(R.string.v3_app_play) { PhoneKeys.playPause(carContext) }
         add(R.string.v3_app_previous) { PhoneKeys.previous(carContext) }
         add(R.string.v3_app_next) { PhoneKeys.next(carContext) }
-        add(R.string.v3_app_back) {
-            if (!MirrorAccessibilityService.pressBack()) {
-                CarToast.makeText(carContext, carContext.getString(R.string.car_accessibility_missing), CarToast.LENGTH_LONG).show()
-            }
-        }
         add(R.string.v3_app_legacy_capture) { screenManager.push(MirrorScreen(carContext, mediaControls = true)) }
         add(R.string.v3_app_exit) { screenManager.popToRoot() }
         return ListTemplate.Builder()

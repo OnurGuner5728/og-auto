@@ -36,6 +36,7 @@ class V3SplitScreen(carContext: CarContext) : Screen(carContext), DefaultLifecyc
 
     override fun onStop(owner: LifecycleOwner) {
         V3SplitDisplay.detach()
+        CameraResumeStore.mark(carContext, "split")
     }
 
     override fun onGetTemplate(): Template {

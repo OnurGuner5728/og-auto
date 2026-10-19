@@ -103,7 +103,8 @@ class AppsScreen(
     }
 
     private fun launch(app: AppEntry) {
-        val intent = carContext.packageManager.getLaunchIntentForPackage(app.pkg)
+        val intent = (carContext.packageManager.getLaunchIntentForPackage(app.pkg)
+            ?: carContext.packageManager.getLeanbackLaunchIntentForPackage(app.pkg))
             ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
         try {
             requireNotNull(intent)
@@ -137,8 +138,11 @@ class AppsScreen(
         val myPackage = carContext.packageName
         executor.execute {
             val result = runCatching {
-                val query = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-                pm.queryIntentActivities(query, PackageManager.MATCH_ALL)
+                val queries = listOf(
+                    Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+                    Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER),
+                )
+                queries.flatMap { pm.queryIntentActivities(it, PackageManager.MATCH_ALL) }
                     .asSequence().map { it.activityInfo }
                     .filter { it.packageName != myPackage }.distinctBy { it.packageName }
                     .map { info ->

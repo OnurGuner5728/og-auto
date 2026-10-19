@@ -127,7 +127,7 @@ internal object V3SplitDisplay {
         layout.addView(divider, if (horizontal) LinearLayout.LayoutParams(d, -1)
             else LinearLayout.LayoutParams(-1, d))
         layout.addView(panes[1].frame, paneParams())
-        if (panes[1].video != null) startVideo()
+        if (panes.any { it.video != null } && player == null) startVideo()
     }
 
     private fun paneParams(): LinearLayout.LayoutParams =
@@ -158,14 +158,15 @@ internal object V3SplitDisplay {
         }
         showVideo = !showVideo
         val layout = root ?: return@onMain
-        val previous = panes.removeAt(1)
+        val targetIndex = if (!showVideo) panes.indexOfFirst { it.video != null }.coerceAtLeast(0) else 1
+        val previous = panes.removeAt(targetIndex)
         layout.removeAllViews()
         previous.web?.destroy()
         stopVideo()
         val replacement = if (showVideo) {
             makeVideo(layout.context)
         } else makeWeb(layout.context, youtubeUrl, 1)
-        panes.add(replacement)
+        panes.add(targetIndex, replacement)
         rebuild()
     }
 
@@ -212,6 +213,7 @@ internal object V3SplitDisplay {
         val channels = VideoPlayback.channels.value
         if (channels.isNotEmpty() && showVideo) {
             videoIndex = (videoIndex + 1).mod(channels.size)
+            stopVideo()
             startVideo()
         }
     }
