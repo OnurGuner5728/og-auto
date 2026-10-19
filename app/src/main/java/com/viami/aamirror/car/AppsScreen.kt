@@ -20,6 +20,7 @@ import androidx.core.graphics.drawable.IconCompat
 import com.onurguner.ogauto.R
 import com.onurguner.ogauto.core.CarLaunchPolicy
 import com.onurguner.ogauto.core.MirrorGateway
+import com.onurguner.ogauto.core.RecentApps
 
 /**
  * Screen2Auto-style launcher: the phone's apps as a grid on the car
@@ -34,7 +35,7 @@ class AppsScreen(
     private data class AppEntry(val label: String, val pkg: String, val icon: CarIcon)
 
     override fun onGetTemplate(): Template {
-        val apps = loadApps()
+        val apps = RecentApps.order(carContext, loadApps()) { it.pkg }
         val limit = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_GRID)
@@ -78,6 +79,7 @@ class AppsScreen(
             // Allowed from the background: OgAuto holds an enabled
             // accessibility service / overlay permission.
             carContext.applicationContext.startActivity(intent)
+            RecentApps.record(carContext, app.pkg)
         } catch (e: Exception) {
             Log.w(TAG, "launch ${app.pkg} failed", e)
             CarToast.makeText(carContext, carContext.getString(R.string.apps_launch_failed), CarToast.LENGTH_LONG).show()

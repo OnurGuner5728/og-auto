@@ -29,6 +29,7 @@ class VideoScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycle
     override fun onStart(owner: LifecycleOwner) {
         VideoPlayback.init(carContext)
         SurfaceRouter.setSink(sink)
+        VideoPlayback.resumeLastSelected(carContext)
     }
 
     override fun onGetTemplate(): Template {
