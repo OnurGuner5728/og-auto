@@ -161,7 +161,11 @@ internal object V3SplitDisplay {
         val targetIndex = if (!showVideo) panes.indexOfFirst { it.video != null }.coerceAtLeast(0) else 1
         val previous = panes.removeAt(targetIndex)
         layout.removeAllViews()
-        previous.web?.destroy()
+        previous.web?.let { web ->
+            previous.frame.removeView(web)
+            web.stopLoading()
+            web.destroy()
+        }
         stopVideo()
         val replacement = if (showVideo) {
             makeVideo(layout.context)
@@ -248,6 +252,7 @@ internal object V3SplitDisplay {
         val cy = web.height * .5f
         val stepX = dx.coerceIn(-web.width * .35f, web.width * .35f)
         val stepY = dy.coerceIn(-web.height * .35f, web.height * .35f)
+        if (web.width < 8 || web.height < 8) return@onMain
         val down = SystemClock.uptimeMillis()
         send(web, MotionEvent.ACTION_DOWN, cx, cy, down)
         send(web, MotionEvent.ACTION_MOVE,
@@ -289,7 +294,11 @@ internal object V3SplitDisplay {
     private fun detachNow() {
         stopVideo()
         panes.forEach { pane ->
-            pane.web?.apply { stopLoading(); destroy() }
+            pane.web?.let { web ->
+                pane.frame.removeView(web)
+                web.stopLoading()
+                web.destroy()
+            }
         }
         panes.clear()
         presentation?.dismiss()
