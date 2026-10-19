@@ -24,6 +24,10 @@ class BrowserScreen(carContext: CarContext) : Screen(carContext), DefaultLifecyc
         SurfaceRouter.setSink(WebSink.of(carContext, BrowserDisplay))
     }
 
+    override fun onStop(owner: LifecycleOwner) {
+        CameraResumeStore.mark(carContext, "browser")
+    }
+
     override fun onGetTemplate(): Template {
         val strip = ActionStrip.Builder()
             .addAction(action(R.drawable.ic_menu) { screenManager.pop() })

@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class MirrorSession : Session(), DefaultLifecycleObserver {
 
     private val shareServer = ShareServer(onUrl = ShareInbox::publish)
+    private var restoreMode: String? = null
 
     init {
         lifecycle.addObserver(this)
@@ -40,6 +41,21 @@ class MirrorSession : Session(), DefaultLifecycleObserver {
         // LAN sharing disabled in OgAuto.
     }
 
+    override fun onStart(owner: LifecycleOwner) {
+        val mode = restoreMode ?: return
+        restoreMode = null
+        val manager = carContext.getCarService(ScreenManager::class.java)
+        if (manager.top !is HomeScreen) return
+        val screen: Screen = when (mode) {
+            "video" -> VideoScreen(carContext)
+            "browser" -> BrowserScreen(carContext)
+            "youtube" -> YouTubeScreen(carContext)
+            "mirror" -> MirrorScreen(carContext)
+            else -> return
+        }
+        manager.push(screen)
+    }
+
     override fun onDestroy(owner: LifecycleOwner) {
         shareServer.stop()
         VideoPlayback.stop()
@@ -52,5 +68,8 @@ class MirrorSession : Session(), DefaultLifecycleObserver {
         manager.push(BrowserScreen(carContext))
     }
 
-    override fun onCreateScreen(intent: Intent): Screen = HomeScreen(carContext)
+    override fun onCreateScreen(intent: Intent): Screen {
+        restoreMode = CameraResumeStore.consumeIfRecent(carContext)
+        return HomeScreen(carContext)
+    }
 }
