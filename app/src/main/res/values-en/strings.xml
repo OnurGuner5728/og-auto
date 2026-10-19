@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">OgAuto</string>
+  <string name="app_name">OgAuto V2 Mirror</string>
   <string name="notification_channel">Mirroring active</string>
   <string name="notification_mirroring">Screen sharing in progress</string>
   <string name="notification_stop">Stop</string>

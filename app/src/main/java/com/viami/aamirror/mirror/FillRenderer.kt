@@ -39,6 +39,7 @@ class FillRenderer(
     private val thread = HandlerThread("mirror-renderer").apply { start() }
     private val handler = Handler(thread.looper)
     private val pacer = FramePacer(maxFps)
+    private val budget = FrameBudget()
     @Volatile private var released = false
     private var lastErrorLogMs = 0L
 
@@ -90,7 +91,7 @@ class FillRenderer(
         try {
             if (released) return
             MirrorStats.onFrameProduced()
-            if (!pacer.shouldDraw(SystemClock.uptimeMillis())) {
+            if (!pacer.shouldDraw(SystemClock.uptimeMillis()) || !budget.canDraw(SystemClock.uptimeMillis())) {
                 MirrorStats.onFrameSkipped()
                 return
             }
@@ -107,7 +108,9 @@ class FillRenderer(
                 }
                 try {
                     // Count a POST, not a mere draw attempt.
+                    val started = SystemClock.uptimeMillis()
                     if (drawFrame(bitmap)) {
+                        budget.recordDrawTime(SystemClock.uptimeMillis() - started, SystemClock.uptimeMillis())
                         MirrorStats.onFrameDrawn()
                     } else {
                         MirrorStats.onFrameDrawFailure()
