@@ -169,4 +169,8 @@
     <string name="v3_app_legacy_capture">Optional legacy screen capture</string>
     <string name="v3_app_exit">Return to OgAuto home</string>
     <string name="v3_app_launched">Launched on phone</string>
+    <string name="v3_app_vehicle_try">Open inside car display (experimental)</string>
+    <string name="v3_external_not_supported">Secondary display activities or touch APIs are unsupported on this phone.</string>
+    <string name="v3_external_testing">Experimental secondary display requested. A black screen may mean the app or phone blocked launch.</string>
+    <string name="v3_external_failed">Cannot launch this app on the secondary display. Open on phone or use optional mirroring.</string>
 </resources>

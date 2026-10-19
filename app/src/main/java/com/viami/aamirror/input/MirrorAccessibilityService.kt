@@ -107,6 +107,37 @@ class MirrorAccessibilityService : AccessibilityService() {
             durationMs,
         )
 
+        /**
+         * Inject events into an experimental secondary public display.
+         * Supported from Android 11; this is not an injection-permission bypass.
+         */
+        fun tapOnDisplay(displayId: Int, x: Float, y: Float): Boolean {
+            if (android.os.Build.VERSION.SDK_INT < 30 || displayId < 0) return false
+            val service = instance ?: return false
+            val path = Path().apply { moveTo(x, y) }
+            val gesture = GestureDescription.Builder()
+                .setDisplayId(displayId)
+                .addStroke(GestureDescription.StrokeDescription(path, 0, 55))
+                .build()
+            return send(service, gesture)
+        }
+
+        fun swipeOnDisplay(
+            displayId: Int, startX: Float, startY: Float, endX: Float, endY: Float,
+        ): Boolean {
+            if (android.os.Build.VERSION.SDK_INT < 30 || displayId < 0) return false
+            val service = instance ?: return false
+            val path = Path().apply {
+                moveTo(startX, startY)
+                lineTo(endX, endY)
+            }
+            val gesture = GestureDescription.Builder()
+                .setDisplayId(displayId)
+                .addStroke(GestureDescription.StrokeDescription(path, 0, 175))
+                .build()
+            return send(service, gesture)
+        }
+
         private val gestureHandler = Handler(Looper.getMainLooper())
         private var activeGesture = false
         private var pendingGesture: GestureDescription? = null

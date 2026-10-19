@@ -169,4 +169,8 @@
     <string name="v3_app_legacy_capture">Eski yansıtmayı isteğe bağlı aç</string>
     <string name="v3_app_exit">OgAuto ana menüsüne dön</string>
     <string name="v3_app_launched">Uygulama telefonda açıldı</string>
+    <string name="v3_app_vehicle_try">Araç ekranında aç (deneysel)</string>
+    <string name="v3_external_not_supported">Bu telefonda ikinci ekran uygulama başlatma veya dokunmatik API\\'si desteklenmiyor.</string>
+    <string name="v3_external_testing">Deneysel ikinci ekran başlatıldı. Görüntü yoksa uygulama/telefon engelliyor olabilir.</string>
+    <string name="v3_external_failed">Bu uygulama ikinci ekranda başlatılamadı. Telefonda açma veya manuel yansıtmayı kullan.</string>
 </resources>

@@ -30,11 +30,13 @@ class V3AppControlScreen(
             items.addItem(Row.Builder().setTitle(carContext.getString(title))
                 .setOnClickListener(click).build())
         }
+        add(R.string.v3_app_vehicle_try) {
+            screenManager.push(V3ExternalAppScreen(carContext, packageName, label))
+        }
         add(R.string.v3_app_open) { openPhoneApp() }
         add(R.string.v3_app_play) { PhoneKeys.playPause(carContext) }
         add(R.string.v3_app_previous) { PhoneKeys.previous(carContext) }
         add(R.string.v3_app_next) { PhoneKeys.next(carContext) }
-        add(R.string.v3_app_legacy_capture) { screenManager.push(MirrorScreen(carContext, mediaControls = true)) }
         add(R.string.v3_app_exit) { screenManager.popToRoot() }
         return ListTemplate.Builder()
             .setTitle(label)
