@@ -152,6 +152,8 @@ Ekran kareleri uygulama tarafından kaydedilmez veya geliştiriciye gönderilmez
 
 ## Sürümler
 
+- **0.8.3** — Daha önce `experiment/v2-all` dalında araçta test edilen V2 optimizasyonları ana sürüme taşındı: uygulama simgelerini arka planda hazırlama, dokunmatik hareketleri sıraya alma, GPU kare bütçesi, görünüm geçişleri ve yeniden bağlanma, IPTV çözücü kurtarma, favoriler, son uygulamalar, kamera sonrası ekran geri yükleme denemesi ve performans kayıtları. Android Auto / araç davranışı cihazdan cihaza değişebilir; tüm V2 deneyleri her araçta kesin çalışır anlamına gelmez. V3'ün uygulama gömme ve iki panel denemeleri bu sürüme dahil **değildir**.
+
 - **0.8.2** — Uygulamalar varsayılan olarak ilk sırada. Uygulama açmak veya Android Auto'nun yeniden bağlanması yansıtmayı başlatmaz; paylaşım araçtan manuel başlatılır. Erişilebilirlik izni açık olsa bile servis bağlantısının kopması ayrı gösterilir, Xiaomi otomatik başlatma ayarları için kısayol eklendi. VYPN'de medya geri/ileri düğmeleri sunulur (VYPN destekliyorsa çalışır).
 
 - **0.8.1** — ImageReader karelerini bekletmeden tüketme, gerçek başarılı kare sayımı, başarısız çizim tanısı ve kontrollü otomatik yeniden bağlanma (oturum başına en fazla iki kez). Android Auto üzerindeki gerçek görünme durumunu telefon tek başına doğrulayamaz; donma sürerse tanı kaydını paylaşın.

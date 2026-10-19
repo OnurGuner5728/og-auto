@@ -13,4 +13,11 @@ class MirrorCarAppService : CarAppService() {
         HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
 
     override fun onCreateSession(): Session = MirrorSession()
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+            AppsScreen.clearCache()
+        }
+    }
 }

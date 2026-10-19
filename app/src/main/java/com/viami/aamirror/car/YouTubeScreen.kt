@@ -28,6 +28,10 @@ class YouTubeScreen(carContext: CarContext) : Screen(carContext), DefaultLifecyc
         SurfaceRouter.setSink(WebSink.of(carContext, YouTubeDisplay))
     }
 
+    override fun onStop(owner: LifecycleOwner) {
+        CameraResumeStore.mark(carContext, "youtube")
+    }
+
     override fun onGetTemplate(): Template {
         val strip = ActionStrip.Builder()
             .addAction(action(R.drawable.ic_menu) { screenManager.pop() })

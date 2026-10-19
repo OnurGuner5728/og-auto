@@ -63,6 +63,7 @@ object VideoPlayback {
     private var appContext: Context? = null
     private var player: ExoPlayer? = null
     private var playerUsesSoftware = false
+    private var autoFallbackSoftware = false
 
     private var virtualDisplay: VirtualDisplay? = null
     private var presentation: Presentation? = null
@@ -122,6 +123,29 @@ object VideoPlayback {
 
     fun playIndex(i: Int) = onMain { playIndexNow(i) }
 
+    /** Resume a previously selected IPTV channel after session recreation.
+     *  Never requests screen-capture permission.
+     */
+    fun resumeLastSelected(context: Context) {
+        init(context)
+        val index = context.getSharedPreferences("video", Context.MODE_PRIVATE)
+            .getInt("last_channel_index", -1)
+        if (index < 0) return
+        if (_channels.value.isNotEmpty()) {
+            onMain { if (player == null && index in _channels.value.indices) playIndexNow(index) }
+        } else {
+            Thread({
+                val cached = PlaylistStore.cached(context)
+                onMain {
+                    if (player == null && index in cached.indices) {
+                        _channels.value = cached
+                        playIndexNow(index)
+                    }
+                }
+            }, "ogauto-resume-channel").start()
+        }
+    }
+
     fun next() = onMain {
         val n = _channels.value.size
         if (n > 0) playIndexNow((_index.value + 1).mod(n))
@@ -150,6 +174,7 @@ object VideoPlayback {
         detachNow()
         player?.release()
         player = null
+        autoFallbackSoftware = false
         _status.value = null
     }
 
@@ -167,6 +192,8 @@ object VideoPlayback {
         val channel = _channels.value.getOrNull(i) ?: return
         val context = appContext ?: return
         _index.value = i
+        context.getSharedPreferences("video", Context.MODE_PRIVATE).edit()
+            .putInt("last_channel_index", i).apply()
         retries = 0
         val p = player ?: buildPlayer()
         val headers = channel.headers.toMutableMap()
@@ -203,7 +230,7 @@ object VideoPlayback {
 
     private fun buildPlayer(): ExoPlayer {
         val context = appContext ?: error("init() not called")
-        val software = MirrorSettings.preferSoftwareDecoder
+        val software = MirrorSettings.preferSoftwareDecoder || autoFallbackSoftware
         // Software first: the phone's hardware codecs are shared with the
         // Android Auto video encoder; on some chipsets a hardware decode
         // starves that encoder and the whole car display freezes.
@@ -246,6 +273,16 @@ object VideoPlayback {
         override fun onPlayerError(error: PlaybackException) {
             Log.w(TAG, "playback error ${error.errorCodeName}", error)
             val p = player ?: return
+            if (error.errorCode in 4000..4999 && !playerUsesSoftware && !autoFallbackSoftware) {
+                autoFallbackSoftware = true
+                val i = _index.value
+                surfaceView?.let { p.clearVideoSurfaceView(it) }
+                p.release()
+                player = null
+                surfaceView?.let { buildPlayer().setVideoSurfaceView(it) } ?: buildPlayer()
+                if (i >= 0) playIndexNow(i)
+                return
+            }
             if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
                 p.seekToDefaultPosition()
                 p.prepare()

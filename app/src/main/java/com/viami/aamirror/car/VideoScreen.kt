@@ -11,6 +11,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.onurguner.ogauto.R
+import com.onurguner.ogauto.core.PerfTrace
 import com.onurguner.ogauto.video.VideoPlayback
 
 /**
@@ -27,8 +28,15 @@ class VideoScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycle
     }
 
     override fun onStart(owner: LifecycleOwner) {
+        val started = PerfTrace.now()
         VideoPlayback.init(carContext)
         SurfaceRouter.setSink(sink)
+        VideoPlayback.resumeLastSelected(carContext)
+        PerfTrace.log("video_screen_start", started)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        CameraResumeStore.mark(carContext, "video")
     }
 
     override fun onGetTemplate(): Template {

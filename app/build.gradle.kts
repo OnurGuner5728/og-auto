@@ -20,8 +20,8 @@ android {
         applicationId = "com.onurguner.ogauto"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.8.2"
+        versionCode = 11
+        versionName = "0.8.3"
     }
 
     signingConfigs {
@@ -44,6 +44,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Mainline package ID: replaces previous OgAuto when signatures match.
+        }
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.findByName("release")

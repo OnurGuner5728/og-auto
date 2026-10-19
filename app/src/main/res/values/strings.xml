@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">OgAuto</string>
+  <string name="app_name">OgAuto V2 ALL</string>
   <string name="notification_channel">Yansıtma etkin</string>
   <string name="notification_mirroring">Telefon ekranı paylaşılıyor</string>
   <string name="notification_stop">Durdur</string>
@@ -147,4 +147,6 @@
   <string name="step_autostart">Xiaomi otomatik başlatma</string>
   <string name="step_autostart_help">Xiaomi/POCO: Güvenlik → İzinler → Otomatik başlatma kısmında OgAuto’ya izin ver. Pil kullanımında Kısıtlama yok seç. Sistem kapatırsa erişilebilirlik izni otomatik açılamaz.</string>
   <string name="accessibility_enabled_not_bound">Erişilebilirlik izni açık ama dokunmatik servisi bağlı değil. Xiaomi otomatik başlatma ve pil ayarlarını kontrol et.</string>
+  <string name="apps_loading">Uygulamalar hazırlanıyor…</string>
+  <string name="favorites_edit">★ Favorileri düzenle</string>
 </resources>
