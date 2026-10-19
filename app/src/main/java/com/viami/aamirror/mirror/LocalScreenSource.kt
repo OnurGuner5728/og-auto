@@ -140,6 +140,8 @@ class LocalScreenSource(
     }
 
     override fun detach() {
+        // Do not refresh an abandoned surface while the host reconnects.
+        lastTarget = null
         virtualDisplay?.surface = null
         MirrorSettings.activeFill = false
         // fillRenderer is only ever created on SDK_INT >= 29 (see attach()).
