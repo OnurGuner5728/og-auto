@@ -30,7 +30,7 @@ object SurfaceRouter {
     private val callback = object : SurfaceCallback {
         override fun onSurfaceAvailable(surfaceContainer: SurfaceContainer) {
             val old = container
-            if (old?.surface === surfaceContainer.surface &&
+            if (old != null && old.surface === surfaceContainer.surface &&
                 old.width == surfaceContainer.width &&
                 old.height == surfaceContainer.height &&
                 old.dpi == surfaceContainer.dpi) return
