@@ -35,7 +35,7 @@ object SurfaceRouter {
                 return
             }
             val previous = container
-            if (previous?.surface === surfaceContainer.surface &&
+            if (previous != null && previous.surface === surfaceContainer.surface &&
                 previous.width == surfaceContainer.width &&
                 previous.height == surfaceContainer.height &&
                 previous.dpi == surfaceContainer.dpi) return
