@@ -18,6 +18,8 @@ import androidx.car.app.model.ItemList
 import androidx.car.app.model.Template
 import androidx.core.graphics.drawable.IconCompat
 import com.onurguner.ogauto.R
+import com.onurguner.ogauto.core.CarLaunchPolicy
+import com.onurguner.ogauto.core.MirrorGateway
 
 /**
  * Screen2Auto-style launcher: the phone's apps as a grid on the car
@@ -37,11 +39,15 @@ class AppsScreen(
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_GRID)
         }.getOrDefault(12).coerceAtLeast(4)
-        val perPage = limit - 2
+        val perPage = (limit - 3).coerceAtLeast(1)
         val start = page * perPage
         val items = ItemList.Builder()
         if (page > 0) {
             items.addItem(navItem(R.string.video_prev_page, R.drawable.ic_skip_prev) { screenManager.pop() })
+        } else {
+            items.addItem(navItem(R.string.apps_manual_mirror, R.drawable.ic_cast) {
+                screenManager.push(MirrorScreen(carContext))
+            })
         }
         apps.drop(start).take(perPage).forEach { app ->
             items.addItem(
@@ -77,9 +83,13 @@ class AppsScreen(
             CarToast.makeText(carContext, carContext.getString(R.string.apps_launch_failed), CarToast.LENGTH_LONG).show()
             return
         }
-        // Back to the mirror (pushing one if the launcher was opened from the home menu).
-        screenManager.popTo(MIRROR_MARKER)
-        if (screenManager.top !is MirrorScreen) screenManager.push(MirrorScreen(carContext))
+        // Never start a capture merely because the user launched a phone app.
+        if (CarLaunchPolicy.returnToExistingMirror(MirrorGateway.state.value.projection)) {
+            screenManager.popTo(MIRROR_MARKER)
+            if (screenManager.top !is MirrorScreen) screenManager.push(MirrorScreen(carContext))
+        } else {
+            CarToast.makeText(carContext, carContext.getString(R.string.apps_started_on_phone), CarToast.LENGTH_LONG).show()
+        }
     }
 
     private fun loadApps(): List<AppEntry> {
